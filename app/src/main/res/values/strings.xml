@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Harpoon SDK</string>
+    <string name="format_not_null">Data format can\'t be null</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+</resources>

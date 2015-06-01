@@ -1,7 +1,5 @@
 package com.amgrade.harpoonsdk.rest;
 
-import android.support.annotation.NonNull;
-
 import com.amgrade.harpoonsdk.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,26 +7,62 @@ import com.google.gson.GsonBuilder;
 import retrofit.RestAdapter;
 import retrofit.converter.Converter;
 import retrofit.converter.GsonConverter;
-import retrofit.converter.SimpleXMLConverter;
+//import retrofit.converter.SimpleXMLConverter;
 
 /**
  * Created by michael on 26.05.15.
  */
 public class RestClient implements Constants{
-    public static final String JSON = ".json";
-    public static final String XML = ".xml";
+//    public static final String JSON = ".json";
+//    public static final String XML = ".xml";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     private static RestClient sInstance;
 
-    private String mFormat;
+    private ApiService mApiService;
+
+//    private String mFormat;
+
+    /**
+     * Singleton to use api client.
+     * @return RestClient to work with api methods
+     */
+    public static RestClient getInstance() {
+        if (sInstance==null) {
+            sInstance = new RestClient();
+        }
+        return sInstance;
+    }
+
+    public RestClient() {
+        Converter converter = null;
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
+                .setDateFormat(DATE_FORMAT)
+                .create();
+        converter = new GsonConverter(gson);
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
+                .setEndpoint(BASE_URL)
+                .setConverter(converter)
+                .build();
+        mApiService = restAdapter.create(ApiService.class);
+    }
+
+    public ApiService getApiService() {
+        return mApiService;
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------
+    // version of methods with ability to choose response format (json/xml)
+    //-----------------------------------------------------------------------------------------------------------------------
 
     /**
      * Singleton to use api client.
      * @param format data format for response. Acceptable values: {@link #JSON} or {@link #XML} otherwise exception will be thrown.
      * @return RestClient to work with api methods
      */
-    public static RestClient getInstance(@NonNull String format) throws Exception {
+/*    public static RestClient getInstance(@NonNull String format) throws Exception {
         if (sInstance==null || !sInstance.getFormat().contentEquals(format)) {
             sInstance = new RestClient(format);
         }
@@ -61,5 +95,5 @@ public class RestClient implements Constants{
 
     public String getFormat() {
         return mFormat;
-    }
+    }*/
 }

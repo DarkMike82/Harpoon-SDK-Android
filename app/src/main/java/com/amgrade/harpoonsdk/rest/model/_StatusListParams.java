@@ -5,14 +5,17 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by michael on 27.05.15.
  */
-public class StatusListParams extends ListParams {
+public class _StatusListParams extends _ListParams {
     @SerializedName("status")
     private String mStatus;
 
-    public StatusListParams() {
+    public _StatusListParams() {
     }
 
-    public StatusListParams(String status, Integer limit, Integer offset) {
+    /**
+     * Empty constructor to provide backwards compatibility with Retrofit
+     */
+    public _StatusListParams(String status, Integer limit, Integer offset) {
         super(limit, offset);
         mStatus = status;
     }

@@ -20,6 +20,11 @@ public class FilterObject implements Serializable{
     public FilterObject() {
     }
 
+    public FilterObject(ArrayList<KeyValuePair> filter) {
+        mFilter = filter;
+        mExtFilter = null;
+    }
+
     public FilterObject(ArrayList<KeyValuePair> filter, ArrayList<FilterItem> extFilter) {
         mFilter = filter;
         mExtFilter = extFilter;

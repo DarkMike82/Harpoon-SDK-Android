@@ -1,9 +1,11 @@
 package com.amgrade.harpoonsdk.rest;
 
 import com.amgrade.harpoonsdk.Constants;
+import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.Converter;
 import retrofit.converter.GsonConverter;
@@ -45,12 +47,28 @@ public class RestClient implements Constants{
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setEndpoint(BASE_URL)
                 .setConverter(converter)
+                .setRequestInterceptor(createInterceptor())
                 .build();
         mApiService = restAdapter.create(ApiService.class);
     }
 
     public ApiService getApiService() {
         return mApiService;
+    }
+
+    private RequestInterceptor createInterceptor() {
+        return new RequestInterceptor() {
+            @Override
+            public void intercept(RequestFacade request) {
+                request.addHeader("appid", HarpoonSDK.getAppId());
+                request.addHeader("appsecret", HarpoonSDK.getAppSecret());
+                request.addHeader("appbundle", HarpoonSDK.getAppBundle());
+                request.addHeader("device", null/*?*/); //TODO
+                request.addHeader("visitor", null/*?*/); //TODO
+                request.addHeader("Accept", "application/json");
+                request.addHeader("Content-Type", "application/json");
+            }
+        };
     }
 
     //-----------------------------------------------------------------------------------------------------------------------

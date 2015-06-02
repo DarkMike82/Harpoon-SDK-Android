@@ -21,6 +21,9 @@ public class HarpoonSDK {
     private static int sUserId;
     private static String sUserToken;
 
+    //brand data
+    private static int sBrandId;
+
     private static Context sContext;
     private static MaterialDialog sMessageDialog;
 
@@ -43,7 +46,7 @@ public class HarpoonSDK {
         sAppBundle = appBundle;
     }
 
-    public void setApiVersion(String version) {
+    public static void setApiVersion(String version) {
         if (TextUtils.isEmpty(version)) {
             sApiVersion = "v1";
         } else {
@@ -51,12 +54,16 @@ public class HarpoonSDK {
         }
     }
 
+    /*public static void setBrand(int brand_id) {
+        sBrandId = brand_id;
+    }*/
+
     /**
      * Set user credentials to use in requests
      * @param id
      * @param token
      */
-    public void setUser(int id, String token) {
+    public static void setUser(int id, String token) {
         sUserId = id;
         sUserToken = token;
     }

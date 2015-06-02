@@ -20,12 +20,41 @@ public class EventData implements Serializable {
     public EventData() {
     }
 
-//    public EventData() {
-//    }
-
     //------------------------------------------------------------------------
     //Nested classes
     //------------------------------------------------------------------------
+    /**
+     * Event stock data
+     */
+    public static class StockDataObject {
+        @SerializedName("qty")
+        private Integer mQuantity;
+        @SerializedName("max_sale_qty")
+        private Integer mMaxSaleQty;
+        @SerializedName("use_config_max_sale_qty")
+        private Integer mUseDefaultMax;
+        @SerializedName("notify_stock_qty")
+        private Integer mNotifyQuantity;
+        @SerializedName("use_config_notify_stock_qty")
+        private Integer mUseDefaultNotify;
+        @SerializedName("is_in_stock")
+        private String mIsInStock;
+
+        /**
+         * Empty constructor to provide backwards compatibility with Retrofit
+         */
+        public StockDataObject() {
+        }
+
+        public StockDataObject(Integer qty, boolean isInStock) {
+            mQuantity = qty;
+            if (isInStock) {
+                mIsInStock = "IN_STOCK";
+            } else {
+                mIsInStock = "OUT_OF_STOCK";
+            }
+        }
+    }
 
     /**
      * Event ticket data
@@ -44,6 +73,9 @@ public class EventData implements Serializable {
         @SerializedName("venue_phone")
         private String mVenuePhone;
 
+        /**
+         * Empty constructor to provide backwards compatibility with Retrofit
+         */
         public TicketDataObject() {
         }
 
@@ -83,6 +115,9 @@ public class EventData implements Serializable {
         @SerializedName("url")
         private String mUrl;
 
+        /**
+         * Empty constructor to provide backwards compatibility with Retrofit
+         */
         public MediaObject() {
         }
 
@@ -127,6 +162,9 @@ public class EventData implements Serializable {
         @SerializedName("height")
         private Integer mCropHeight;
 
+        /**
+         * Empty constructor to provide backwards compatibility with Retrofit
+         */
         public CropObject() {
         }
 

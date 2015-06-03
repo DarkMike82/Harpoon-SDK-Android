@@ -2,9 +2,11 @@ package com.amgrade.harpoonsdk.rest;
 
 import com.amgrade.harpoonsdk.rest.model.EventData;
 import com.amgrade.harpoonsdk.rest.model.FilterObject;
+import com.amgrade.harpoonsdk.rest.model.ListParams;
 import com.google.gson.JsonObject;
 
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -17,10 +19,36 @@ import retrofit.http.Query;
 /**
  * Created by michael on 27.05.15.
  */
-public interface ApiService {
+interface ApiService {
 
     //You can use "{version}" in path (instead of "v1") and "@Path("version")String version" in method params
     //if you want to let user choose an API version to work with
+
+    //-------------------------------------------------------------------
+    //Application api methods
+    //-------------------------------------------------------------------
+    @GET("v1/application/setting")
+    void getApplicationSettings(RestCallback callback);
+
+    //-------------------------------------------------------------------
+    //Brand api methods
+    //-------------------------------------------------------------------
+    @GET("v1/user/{userId}/brand")
+    void getBrands(@Path("userId")Integer user_id, @Body ListParams params);
+
+    //-------------------------------------------------------------------
+    //User api methods
+    //-------------------------------------------------------------------
+    @GET("/v1/user")
+    void createUser();
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------
+//    OLD METHODS, MAYBE NOT NEEDED
 
     //-------------------------------------------------------------------
     //Brand api methods

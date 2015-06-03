@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by michael on 27.05.15.
  */
-public class _StatusListParams extends _ListParams {
+public class _StatusListParams extends ListParams {
     @SerializedName("status")
     private String mStatus;
 

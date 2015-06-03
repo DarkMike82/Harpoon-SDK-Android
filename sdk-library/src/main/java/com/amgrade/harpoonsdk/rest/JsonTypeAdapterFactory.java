@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by michael on 27.05.15.
  */
-public class JsonTypeAdapterFactory implements TypeAdapterFactory {
+class JsonTypeAdapterFactory implements TypeAdapterFactory {
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
 

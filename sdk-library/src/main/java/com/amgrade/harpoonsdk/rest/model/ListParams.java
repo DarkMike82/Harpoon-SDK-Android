@@ -4,8 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by michael on 27.05.15.
+ * @hide
  */
-public class _ListParams {
+public class ListParams {
     @SerializedName("limit")
     private Integer mLimit;
 
@@ -15,10 +16,10 @@ public class _ListParams {
     /**
      * Empty constructor to provide backwards compatibility with Retrofit
      */
-    public _ListParams(){
+    public ListParams(){
     }
 
-    public _ListParams(Integer limit, Integer offset) {
+    public ListParams(Integer limit, Integer offset) {
         if (limit==null || limit<1) {
             mLimit = 20;
         } else {

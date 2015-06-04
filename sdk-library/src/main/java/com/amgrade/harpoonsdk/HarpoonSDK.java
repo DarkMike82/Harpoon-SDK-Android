@@ -1,7 +1,6 @@
 package com.amgrade.harpoonsdk;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -9,8 +8,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
  * Created by michael on 27.05.15.
  */
 public class HarpoonSDK {
-    //api settings
-    private static String sApiVersion = "v1";
 
     //app data
     private static String sAppId;
@@ -46,13 +43,13 @@ public class HarpoonSDK {
         sAppBundle = appBundle;
     }
 
-    public static void setApiVersion(String version) {
+    /*public static void setApiVersion(String version) {
         if (TextUtils.isEmpty(version)) {
             sApiVersion = "v1";
         } else {
             sApiVersion = "v" + version;
         }
-    }
+    }*/
 
     /*public static void setBrand(int brand_id) {
         sBrandId = brand_id;
@@ -68,9 +65,9 @@ public class HarpoonSDK {
         sUserToken = token;
     }
 
-    public static String getApiVersion() {
-        return sApiVersion;
-    }
+//    public static String getApiVersion() {
+//        return sApiVersion;
+//    }
 
     public static String getAppId() {
         return sAppId;

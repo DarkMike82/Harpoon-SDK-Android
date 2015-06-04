@@ -1,17 +1,10 @@
 package com.amgrade.harpoonsdk.rest;
 
-import com.amgrade.harpoonsdk.rest.model.EventData;
-import com.amgrade.harpoonsdk.rest.model.FilterObject;
-import com.amgrade.harpoonsdk.rest.model.ListParams;
-import com.google.gson.JsonObject;
+import java.io.Serializable;
 
-import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
-import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -20,150 +13,94 @@ import retrofit.http.Query;
  * Created by michael on 27.05.15.
  */
 interface ApiService {
-
-    //You can use "{version}" in path (instead of "v1") and "@Path("version")String version" in method params
-    //if you want to let user choose an API version to work with
-
     //-------------------------------------------------------------------
     //Application api methods
     //-------------------------------------------------------------------
-    @GET("v1/application/setting")
-    void getApplicationSettings(RestCallback callback);
+    @GET("/{v}/application/setting")
+    void getApplicationSettings(@Path("")String apiVersion, RestCallback callback);
 
     //-------------------------------------------------------------------
     //Brand api methods
     //-------------------------------------------------------------------
-    @GET("v1/user/{userId}/brand")
-    void getBrands(@Path("userId")Integer user_id, @Body ListParams params);
+    @GET("/{v}/user/{userId}/brand")
+    void getBrands(@Path("v")String apiVersion, @Path("userId")Integer user_id,
+                   @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}")
+    void getBrandById(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                      RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/business")
+    void getBrandVenues(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                        @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/feed")
+    void getBrandFeeds(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                       @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/follower")
+    void getBrandFollowers(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                          @Body Serializable params, RestCallback callback);
+
+    @PUT("{v}/user/{userId}/brand/{brandId}/follower")
+    void followBrand(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                     RestCallback callback);
+
+    @DELETE("{v}/user/{userId}/brand/{brandId}/follower")
+    void unfollowBrand(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                     RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/product")
+    void getBrandProducts(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                          @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/event")
+    void getBrandEvents(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                          @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/user/{userId}/brand/{brandId}/offer")
+    void getBrandOffers(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("brandId")Integer brand_id,
+                          @Body Serializable params, RestCallback callback);
 
     //-------------------------------------------------------------------
-    //User api methods
+    //Product api methods
     //-------------------------------------------------------------------
-    @GET("/v1/user")
-    void createUser();
+    @GET("/{v}/user/{userId}/product")
+    void getProducts(@Path("v")String apiVersion, @Path("userId")Integer user_id,
+                          @Body Serializable params, RestCallback callback);
 
-
-//-------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------------------------------------
-//    OLD METHODS, MAYBE NOT NEEDED
-
-    //-------------------------------------------------------------------
-    //Brand api methods
-    //-------------------------------------------------------------------
-    @FormUrlEncoded
-    @GET("/v1/{user_id}/brand/{format}")
-    void getAvailableBrands(//@Header("Content-Type")String type, @Header("appid")String appId,
-                            //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                            @Path("user_id")Integer id, @Path("format")String format, @Query("token")String token,
-                            @Field("limit")Integer limit, @Field("offset")Integer offset,
-                            Callback<JsonObject> callback);
-
-    @GET("/v1/{user_id}/brand/{brand_id}/{format}")
-    void getBrandDetails(//@Header("Content-Type")String type, @Header("appid")String appId,
-                         //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                         @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                         @Path("format")String format, @Query("token")String token,
-                         Callback<JsonObject> callback);
-
-    //-------------------------------------------------------------------
-    //Campaign api methods
-    //-------------------------------------------------------------------
-    @FormUrlEncoded
-    @POST("/v1/{user_id}/brand/{brand_id}/campaign/{format}")
-    void createCampaign(//@Header("Content-Type")String type, @Header("appid")String appId,
-                        //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                        @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                        @Path("format")String format, @Query("token")String token,
-                        @Field("name")String name, @Field("description")String decsription,
-                        Callback<JsonObject> callback);
-
-    @FormUrlEncoded
-    @GET("/v1/{user_id}/brand/{brand_id}/campaign/{format}")
-    void getCampaigns(//@Header("Content-Type")String type, @Header("appid")String appId,
-                      //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                      @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                      @Path("format")String format, @Query("token")String token,
-                      @Field("status")String status, @Field("limit")Integer limit, @Field("offset")Integer offset,
-                      Callback<JsonObject> callback);
-
-    @FormUrlEncoded
-    @GET("/v1/{user_id}/brand/{brand_id}/campaign/{campaign_id}/{format}")
-    void updateCampaign(//@Header("Content-Type")String type, @Header("appid")String appId,
-                        //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                        @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                        @Path("campaign_id")Integer campaign_id, @Path("format")String format, @Query("token")String token,
-                        @Field("status")String status, @Field("limit")Integer limit, @Field("offset")Integer offset,
-                        Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/product/{productId}")
+    void getProductById(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("productId")String product_id,
+                        @Query("id_type")String id_type, RestCallback callback);
 
     //-------------------------------------------------------------------
     //Event api methods
     //-------------------------------------------------------------------
-    @GET("/v1/{user_id}/brand/{brand_id}/event/{event_id}/{format}")
-    void getEventDetails(//@Header("Content-Type")String type, @Header("appid")String appId,
-                         //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                         @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                         @Path("event_id")Object event_id, @Path("format")String format,
-                         @Query("token")String token, @Query("event_id_type")String event_type_id,
-                         Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/event")
+    void getEvents(@Path("v")String apiVersion, @Path("userId")Integer user_id,
+                   @Body Serializable params, RestCallback callback);
 
-    @FormUrlEncoded
-    @GET("/v1/{user_id}/brand/{brand_id}/event/{format}")
-    void getEventList(//@Header("Content-Type")String type, @Header("appid")String appId,
-                      //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                      @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                      @Path("format")String format, @Query("token")String token,
-                      @Field("filter")FilterObject filter,
-                      Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/event/{eventId}")
+    void getEventById(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("eventId")String event_id,
+                      @Query("id_type")String id_type, RestCallback callback);
 
-    @FormUrlEncoded
-    @POST("/v1/{user_id}/brand/{brand_id}/event/{format}")
-    void createEvent(//@Header("Content-Type")String type, @Header("appid")String appId,
-                     //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                     @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                     @Path("format")String format, @Query("token")String token,
-                     @Field("campaign_id")Integer cmpId, @Field("external_id")String extId, @Field("data")EventData data,
-                     Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/event/{eventId}/customer")
+    void getEventCustomers(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("eventId")String event_id,
+                           @Query("id_type")String id_type, @Body Serializable params, RestCallback callback);
 
-    @FormUrlEncoded
-    @PUT("/v1/{user_id}/brand/{brand_id}/event/{event_id}/{format}")
-    void updateEvent(//@Header("Content-Type")String type, @Header("appid")String appId,
-                     //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                     @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                     @Path("event_id")Object event_id, @Path("format")String format,
-                     @Query("token")String token, @Query("event_id_type")String event_type_id,
-                     @Field("data")EventData data,
-                     Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/event/{eventId}/venue")
+    void getEventVenues(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("eventId")String event_id,
+                           @Query("id_type")String id_type, @Body Serializable params, RestCallback callback);
 
-    @POST("/v1/{user_id}/brand/{brand_id}/event/{event_id}/validate/{format}")
-    void validateEvent(//@Header("Content-Type")String type, @Header("appid")String appId,
-                       //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                       @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                       @Path("event_id")Object event_id, @Path("format")String format,
-                       @Query("token")String token, @Query("event_id_type")String event_type_id,
-                       Callback<JsonObject> callback);
-
-    @POST("/v1/{user_id}/brand/{brand_id}/event/{event_id}/publish/{format}")
-    void publishEvent(//@Header("Content-Type")String type, @Header("appid")String appId,
-                      //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                      @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                      @Path("event_id")Integer event_id, @Path("format")String format,
-                      @Query("token")String token, @Query("event_id_type")String event_type_id,
-                      Callback<JsonObject> callback);
-
-    @DELETE("/v1/{user_id}/brand/{brand_id}/event/{event_id}/{format}")
-    void deleteEvent(//@Header("Content-Type")String type, @Header("appid")String appId,
-                     //@Header("appsecret")String appSecret, @Header("appbundle")String appBundle,
-                     @Path("user_id")Integer user_id, @Path("brand_id")Integer brand_id,
-                     @Path("event_id")Object event_id, @Path("format")String format,
-                     @Query("token")String token, @Query("event_id_type")String event_type_id,
-                     Callback<JsonObject> callback);
+    @GET("/{v}/user/{userId}/event/{eventId}/ticket")
+    void getEventTickets(@Path("v")String apiVersion, @Path("userId")Integer user_id, @Path("eventId")String event_id,
+                           @Query("id_type")String id_type, @Body Serializable params, RestCallback callback);
 
     //-------------------------------------------------------------------
-    //Event-media api methods
+    //User api methods
     //-------------------------------------------------------------------
+//    @GET("/{v}/user")
+//    void createUser();
 
 
 }

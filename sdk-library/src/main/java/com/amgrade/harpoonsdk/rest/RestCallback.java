@@ -14,8 +14,11 @@ import retrofit.client.Response;
 class RestCallback implements Callback<JsonObject> {
     private static final String OK = "success";
 
+    public static final int SET_USER = 1;
+
     private ApiListener mListener;
     private String[] mKeys;
+    private int mSuccessAction = -1;
 
     public RestCallback(ApiListener listener, String... keys) {
         mListener = listener;
@@ -28,6 +31,7 @@ class RestCallback implements Callback<JsonObject> {
             String status = jsonObject.get("status").getAsString();
             if (OK.contentEquals(status)) {
                 JsonObject responseData = extractData(mKeys, jsonObject);
+                performAction(mSuccessAction, responseData);
                 mListener.onSuccess(responseData);
             } else {
                 mListener.onRequestError(getErrorMessage(jsonObject));
@@ -42,6 +46,9 @@ class RestCallback implements Callback<JsonObject> {
         mListener.onError(error);
     }
 
+    public void setOnSuccessAction(int action) {
+        mSuccessAction = action;
+    }
 
     //---------------------------------------------------------------------
     //internal methods
@@ -61,5 +68,16 @@ class RestCallback implements Callback<JsonObject> {
         JsonObject data = response.get("data").getAsJsonObject();
         message = data.get("message").getAsString();
         return message;
+    }
+
+    private void performAction(int action, JsonObject data) {
+        switch (action) {
+            case SET_USER:
+                HarpoonSDK.setUser(data.get("id").getAsString(),
+                        data.get("token").getAsString());
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -20,7 +20,6 @@ Thumbs.db
 .idea
 
 .gradle
-/facebook/build
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries

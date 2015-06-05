@@ -15,7 +15,7 @@ public class HarpoonSDK {
     private static String sAppBundle; //app package name
 
     //user data
-    private static int sUserId;
+    private static String sUserId;
     private static String sUserToken;
 
     //brand data
@@ -60,7 +60,7 @@ public class HarpoonSDK {
      * @param id
      * @param token
      */
-    public static void setUser(int id, String token) {
+    public static void setUser(String id, String token) {
         sUserId = id;
         sUserToken = token;
     }
@@ -81,7 +81,7 @@ public class HarpoonSDK {
         return sAppBundle;
     }
 
-    public static int getUserId() {
+    public static String getUserId() {
         return sUserId;
     }
 

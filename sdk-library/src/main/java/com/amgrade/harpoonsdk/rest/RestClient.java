@@ -5,6 +5,7 @@ import com.amgrade.harpoonsdk.rest.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import retrofit.RequestInterceptor;
@@ -83,9 +84,68 @@ public class RestClient {
     //Rest API facade
     //-----------------------------------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------------------------------------------
+
+    //------Application api methods--------------------------------------
+
     public void getApplicationSettings(ApiListener listener) {
         getApiService().getApplicationSettings(sApiVersion, new RestCallback(listener, "data","application","setting"));
     }
+
+    //------eCommerce api methods----------------------------------------
+
+    public void createCart(ApiListener listener) {
+        getApiService().createCart(sApiVersion, HarpoonSDK.getUserId(), new RestCallback(listener, "data","ecommerce","cart"));
+    }
+
+    public void addProducts(String cartId, Serializable[] products, ApiListener listener) {
+        HashMap<String, Serializable[]> params = new HashMap();
+        params.put("products", products);
+        getApiService().addProducts(sApiVersion, HarpoonSDK.getUserId(), cartId, params,
+                new RestCallback(listener, "data", "ecommerce", "cart", "product"));
+    }
+
+    public void updateProducts(String cartId, Serializable[] products, ApiListener listener) {
+        HashMap<String, Serializable[]> params = new HashMap();
+        params.put("products", products);
+        getApiService().updateProducts(sApiVersion, HarpoonSDK.getUserId(), cartId, params,
+                new RestCallback(listener, "data", "ecommerce", "cart", "product"));
+    }
+
+    public void removeProducts(String cartId, Serializable[] products, ApiListener listener) {
+        HashMap<String, Serializable[]> params = new HashMap();
+        params.put("products", products);
+        getApiService().removeProducts(sApiVersion, HarpoonSDK.getUserId(), cartId, params,
+                new RestCallback(listener, "data", "ecommerce", "cart", "product"));
+    }
+
+    public void cartProducts(String cartId, ApiListener listener) {
+        getApiService().cartProducts(sApiVersion, HarpoonSDK.getUserId(), cartId,
+                new RestCallback(listener, "data", "ecommerce", "cart", "product"));
+    }
+
+    public void cartTotals(String cartId, ApiListener listener) {
+        getApiService().cartTotals(sApiVersion, HarpoonSDK.getUserId(), cartId,
+                new RestCallback(listener, "data", "ecommerce", "cart"));
+    }
+
+    public void cartById(String cartId, ApiListener listener) {
+        getApiService().cartById(sApiVersion, HarpoonSDK.getUserId(), cartId,
+                new RestCallback(listener, "data", "ecommerce", "cart"));
+    }
+
+    public void getCheckoutURLWithProducts(Serializable[] products, ApiListener listener) {
+        HashMap<String, Object> params = new HashMap();
+        params.put("products", products);
+        params.put("params", "sdk=true");
+        getApiService().getCheckoutURLWithProducts(sApiVersion, HarpoonSDK.getUserId(),
+                params, new RestCallback(listener, "data", "ecommerce", "cart"));
+    }
+
+    //------User api methods--------------------------------------------
+
+//    private void createUser()
+
+    //------Brand api methods--------------------------------------------
 
     public void getBrands(ApiListener listener) {
         getBrands(DEF_LIMIT, DEF_OFFSET, listener);
@@ -177,6 +237,8 @@ public class RestClient {
                 params, new RestCallback(listener, "data", "brand", "event"));
     }
 
+    //------Product api methods--------------------------------------------
+
     public void getProducts(ApiListener listener) {
         getProducts(DEF_LIMIT, DEF_OFFSET, null, listener);
     }
@@ -197,6 +259,8 @@ public class RestClient {
         getApiService().getProductById(sApiVersion, HarpoonSDK.getUserId(), productId, id_type,
                 new RestCallback(listener, "data", "product"));
     }
+
+    //------Event api methods--------------------------------------------
 
     public void getEvents(ApiListener listener) {
         getEvents(DEF_LIMIT, DEF_OFFSET, null, listener);
@@ -256,6 +320,63 @@ public class RestClient {
         HashMap<String, Object> params = Data.listParams(limit, offset);
         getApiService().getEventTickets(sApiVersion, HarpoonSDK.getUserId(), eventId, id_type,
                 params, new RestCallback(listener, "data", "event", "ticket"));
+    }
+
+    //------Offer api methods--------------------------------------------
+
+    public void getOffers(ApiListener listener) {
+        getOffers(null, null, null, listener);
+    }
+    public void getOffers(HashMap<String, Object> filter, ApiListener listener) {
+        getOffers(filter, null, null, listener);
+    }
+    public void getOffers(HashMap<String, Object> filter, Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getOffers(sApiVersion, HarpoonSDK.getUserId(), params,
+                new RestCallback(listener, "data", "offer"));
+    }
+
+    public void getOfferById(String offerId, ApiListener listener) {
+        getEventById(offerId, null, listener);
+    }
+    public void getOfferById(String offerId, String id_type, ApiListener listener) {
+        getApiService().getOfferById(sApiVersion, HarpoonSDK.getUserId(), offerId, id_type,
+                new RestCallback(listener, "data", "offer"));
+    }
+
+    public void getOfferCustomers(String offerId, ApiListener listener) {
+        getOfferCustomers(offerId, null, null, null, listener);
+    }
+    public void getOfferCustomers(String offerId, Integer limit, Integer offset, ApiListener listener) {
+        getOfferCustomers(offerId, null, limit, offset, listener);
+    }
+    public void getOfferCustomers(String offerId, String id_type,
+                                Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getOfferCustomers(sApiVersion, HarpoonSDK.getUserId(), offerId, id_type,
+                params, new RestCallback(listener, "data", "offer"));
+    }
+
+    public void getOfferVenues(String offerId, ApiListener listener) {
+        getOfferVenues(offerId, null, null, null, listener);
+    }
+    public void getOfferVenues(String offerId, Integer limit, Integer offset, ApiListener listener) {
+        getOfferVenues(offerId, null, limit, offset, listener);
+    }
+    public void getOfferVenues(String offerId, String id_type,
+                                Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getOfferVenues(sApiVersion, HarpoonSDK.getUserId(), offerId, id_type,
+                params, new RestCallback(listener, "data", "offer", "venue"));
+    }
+
+    public void getOfferCoupons(String offerId, ApiListener listener) {
+        getOfferCoupons(offerId, null, listener);
+    }
+
+    public void getOfferCoupons(String offerId, String id_type, ApiListener listener) {
+        getApiService().getOfferCoupons(sApiVersion, HarpoonSDK.getUserId(), offerId, id_type,
+                new RestCallback(listener, "data", "offer", "coupon"));
     }
 
 }

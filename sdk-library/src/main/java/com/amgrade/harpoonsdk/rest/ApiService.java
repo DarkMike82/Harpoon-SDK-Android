@@ -17,8 +17,8 @@ interface ApiService {
     //-------------------------------------------------------------------
     //Application api methods
     //-------------------------------------------------------------------
-    @GET("/{v}/application/setting")
-    void getApplicationSettings(@Path("")String apiVersion, RestCallback callback);
+    @GET("/{v}/application/environment")
+    void getApplicationSettings(@Path("v")String apiVersion, RestCallback callback);
 
     //-------------------------------------------------------------------
     //eCommerce api methods

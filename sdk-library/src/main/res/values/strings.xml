@@ -11,10 +11,14 @@
     <string name="cancel">Cancel</string>
 
     <string name="no_context">SDK context is not initialised!</string>
-    <string name="wrong_response">Unexpected server response</string>
+    <string name="error_net">Unexpected network error occurred. Please try again later or check your internet settings.</string>
+    <string name="error_conv">Conversion error (wrong response format).</string>
+    <string name="error_unknown">Unknown error occurred. PLease try again later.</string>
+    <string name="error_server_unknown">Unknown server error. PLease try again later.</string>
 
-    <string name="wrong_cmp_id">Campaign id must be positive integer</string>
+
+    <!--<string name="wrong_cmp_id">Campaign id must be positive integer</string>
     <string name="wrong_event_data">Event data can\'t be null</string>
     <string name="wrong_ext_id">External id must be at least 1 character long</string>
-    <string name="wrong_crop_data">Crop data must have 4 params - X/Y/Width/Height</string>
+    <string name="wrong_crop_data">Crop data must have 4 params - X/Y/Width/Height</string>-->
 </resources>

@@ -31,6 +31,8 @@ public class RestClient {
 
     private static RestClient sInstance;
 
+    private static Converter sConverter; //TODO
+
     private ApiService mApiService;
 
     /**
@@ -44,17 +46,22 @@ public class RestClient {
         return sInstance;
     }
 
+    public static Converter getConverter() {
+        return sConverter;
+    }
+
     private RestClient() {
-        Converter converter = null;
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
-                .setDateFormat(DATE_FORMAT)
-                .create();
-        converter = new GsonConverter(gson);
+        if (sConverter == null) {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
+                    .setDateFormat(DATE_FORMAT)
+                    .create();
+            sConverter = new GsonConverter(gson);
+        }
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setEndpoint(BASE_URL)
-                .setConverter(converter)
+                .setConverter(sConverter)
                 .setRequestInterceptor(createInterceptor())
                 .build();
         mApiService = restAdapter.create(ApiService.class);
@@ -88,7 +95,7 @@ public class RestClient {
     //------Application api methods--------------------------------------
 
     public void getApplicationSettings(ApiListener listener) {
-        getApiService().getApplicationSettings(sApiVersion, new RestCallback(listener, "data","application","setting"));
+        getApiService().getApplicationSettings(sApiVersion, new RestCallback(listener, "data","application","environment"));
     }
 
     //------eCommerce api methods----------------------------------------

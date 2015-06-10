@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.R;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import retrofit.Callback;
@@ -22,27 +23,33 @@ class RestCallback implements Callback<JsonObject> {
     private ApiListener mListener;
     private String[] mKeys;
     private int mSuccessAction = -1;
+    private boolean isArrayResponse = false;
 
     public RestCallback(ApiListener listener, String... keys) {
         mListener = listener;
         mKeys = keys;
     }
 
+    public RestCallback(boolean isArray, ApiListener listener, String... keys) {
+        mListener = listener;
+        mKeys = keys;
+        isArrayResponse = isArray;
+    }
+
     @Override
     public void success(JsonObject jsonObject, Response response) {
-        //since 09.06.2015 API rules mean that only "success" responses will be processed here
-//        if (jsonObject.has("status")) {
-//            String status = jsonObject.get("status").getAsString();
-//            if (OK.contentEquals(status)) {
-                JsonObject responseData = extractData(mKeys, jsonObject);
-                performAction(mSuccessAction, responseData);
-                mListener.onSuccess(responseData);
-//            } else {
-//                mListener.onRequestError(getErrorMessage(jsonObject));
-//            }
-//        } else {
-//            mListener.onRequestError(HarpoonSDK.getContext().getString(R.string.wrong_response)+"\n"+jsonObject.getAsString());
-//        }
+        //since 09.06.2015 API settings changed, so only "success" responses will be processed here
+        JsonElement responseData = extractData(mKeys, jsonObject);
+        performAction(mSuccessAction, responseData.getAsJsonObject());
+        if (responseData==null) {
+            mListener.onSuccess();
+        } else {
+            if (isArrayResponse) {
+                mListener.onSuccess(responseData.getAsJsonArray());
+            } else {
+                mListener.onSuccess(responseData.getAsJsonObject());
+            }
+        }
     }
 
     @Override
@@ -74,8 +81,8 @@ class RestCallback implements Callback<JsonObject> {
             body = (JsonObject)error.getBodyAs(JsonObject.class);
         } catch (Exception e) {
             Log.e(ConversionException.class.getName(), e.getLocalizedMessage());
-            responseMsg = getString(R.string.error_conv);
-            mListener.onError(null, responseMsg);
+//            responseMsg = getString(R.string.error_conv);
+            mListener.onError(response.getStatus()+"", response.getReason());
             return;
         }
         //if response is valid JSON
@@ -90,11 +97,11 @@ class RestCallback implements Callback<JsonObject> {
     //---------------------------------------------------------------------
     //internal methods
     //---------------------------------------------------------------------
-    private JsonObject extractData(String[] keys, JsonObject container) {
-        JsonObject data = null;
+    private JsonElement extractData(String[] keys, JsonObject container) {
+        JsonElement data = null;
         if (keys!=null) {
             for (int i = 0; i < keys.length; i++) {
-                data = container.get(keys[i]).getAsJsonObject();
+                data = container.get(keys[i]);
             }
         }
         return data;

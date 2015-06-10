@@ -47,6 +47,25 @@ public class Data {
     //user-data methods
     //-------------------------------------------------------------------
 
+    public static HashMap<String, String> userParams(boolean social, String... data) {
+        HashMap<String, String> params = new HashMap<>();
+        if (social) {
+            params.put("user_id", data[0]);
+            params.put("user_token", data[1]);
+        } else {
+            params.put("email", data[0]);
+            params.put("password", data[1]);
+        }
+        return params;
+    }
+
+    public static HashMap<String, String> pwdParams(String... data) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("current_password", data[0]);
+        params.put("new_password", data[1]);
+        return params;
+    }
+
     public static HashMap getUser() {
         return sUser;
     }
@@ -56,32 +75,39 @@ public class Data {
      * @param email
      * @param pwd
      * @param f_name
-     * @param m_name
      * @param l_name
      * @param birthday
      * @param gender
      */
     public static void setUser(String email, String pwd,
-                                   String f_name, String m_name, String l_name,
+                                   String f_name, String l_name,
                                    String birthday, String gender) {
         if (sUser==null) {
-            sUser = new UserData(email, pwd, f_name, m_name, l_name, birthday, gender);
+            sUser = new UserData(email, pwd, f_name, l_name, birthday, gender);
         } else {
-            sUser.setData(email, pwd, f_name, m_name, l_name, birthday, gender);
+            sUser.setData(email, pwd, f_name, l_name, birthday, gender);
         }
     }
 
-    public static void setUserAddress(String country, String county, String city, String postcode) {
+    /*public static void setUserAddress(String country, String county, String city, String postcode) {
         sUser.setAddress(country, county, city, postcode);
+    }*/
+
+    public static void setProfilePicture(String mime, String base64encodedpicture) {
+        sUser.setPicture(mime, base64encodedpicture);
     }
 
     public static void addUserMetadata(String[] keys, Object[] values){
         sUser.addMetadata(keys, values);
     }
 
-    public static void setUserLocation(String lat, String lon) {
-        sUser.setLocation(lat, lon);
+    public static void setConnection(String connection_name, String userId, String token) {
+        sUser.setConnection(connection_name, userId, token);
     }
+
+    /*public static void setUserLocation(String lat, String lon) {
+        sUser.setLocation(lat, lon);
+    }*/
 
     public static void clearUser() {
         sUser.clear();

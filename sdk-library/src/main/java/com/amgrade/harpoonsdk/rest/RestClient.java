@@ -4,6 +4,7 @@ import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.rest.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -95,13 +96,13 @@ public class RestClient {
     //------Application api methods--------------------------------------
 
     public void getApplicationSettings(ApiListener listener) {
-        getApiService().getApplicationSettings(sApiVersion, new RestCallback(listener, "data","application","environment"));
+        getApiService().getApplicationSettings(sApiVersion, new RestCallback(listener, "data", "application", "environment"));
     }
 
     //------eCommerce api methods----------------------------------------
 
     public void createCart(ApiListener listener) {
-        getApiService().createCart(sApiVersion, HarpoonSDK.getUserId(), new RestCallback(listener, "data","ecommerce","cart"));
+        getApiService().createCart(sApiVersion, HarpoonSDK.getUserId(), new RestCallback(listener, "data", "ecommerce", "cart"));
     }
 
     public void addProducts(String cartId, Serializable[] products, ApiListener listener) {
@@ -150,7 +151,251 @@ public class RestClient {
 
     //------User api methods--------------------------------------------
 
-//    private void createUser()
+    public void createUser(ApiListener listener) {
+        getApiService().createUser(sApiVersion, Data.getUser(), new RestCallback(listener, "data", "user"));
+    }
+
+    public void getUser(ApiListener listener) {
+        getApiService().getUser(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                new RestCallback(listener, "data", "user"));
+    }
+
+    public void getUserById(String userId, ApiListener listener) {
+        getApiService().getUserById(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                userId, new RestCallback(listener, "data", "user"));
+    }
+
+    /**
+     * Get users as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener
+     */
+    public void getUsers(ApiListener listener) {
+        getUsers(DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getUsers(HashMap<String, Object> filter, ApiListener listener) {
+        getUsers(DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getUsers(Integer limit, Integer offset, HashMap<String, Object> filter,
+                         ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getUsers(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(), params,
+                new RestCallback(true, listener, "data", "user"));
+    }
+
+    public void updateUser(ApiListener listener) {
+        getApiService().updateUser(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                Data.getUser(), new RestCallback(listener, "data", "user"));
+    }
+
+    public void login(String email, String pwd, ApiListener listener) {
+        HashMap<String, String> params = Data.userParams(false, email, pwd);
+        getApiService().login(sApiVersion, "email", params, new RestCallback(listener, "data", "user"));
+    }
+    public void loginWithFacebook(String fbUserId, String fbUserToken, ApiListener listener) {
+        HashMap<String, String> params = Data.userParams(true, fbUserId, fbUserToken);
+        getApiService().login(sApiVersion, "facebook", params, new RestCallback(listener, "data", "user"));
+    }
+    public void loginWithTwitter(String twUserId, String twUserToken, ApiListener listener) {
+        HashMap<String, String> params = Data.userParams(true, twUserId, twUserToken);
+        getApiService().login(sApiVersion, "twitter", params, new RestCallback(listener, "data", "user"));
+    }
+
+    /**
+     * Init password reset for user with provided email<br/>
+     * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
+     * @param email email of user to reset password for
+     * @param listener
+     */
+    public void resetPassword(String email, ApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("email", email);
+        getApiService().resetPassword(sApiVersion, params, new RestCallback(listener, "data"));
+    }
+
+    /**
+     * Init password reset for current user<br/>
+     * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
+     * @param listener
+     */
+    public void resetPasswordForCurrentUser(ApiListener listener) {
+        getApiService().resetPasswordWithAuth(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                new RestCallback(listener, "data"));
+    }
+
+    /**
+     * Update password for current user<br/>
+     * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
+     * @param cur_pwd   current password
+     * @param new_pwd   new password
+     * @param listener
+     */
+    public void updatePassword(String cur_pwd, String new_pwd, ApiListener listener) {
+        HashMap<String, String> params = Data.pwdParams(cur_pwd, new_pwd);
+        getApiService().updatePassword(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data"));
+    }
+
+    /**
+     * Connect user to social account
+     * @param provider  "facebook" or "twitter"
+     * @param userId    user id from social network
+     * @param userToken user token from social network
+     * @param listener
+     */
+    public void addConnection(String provider, String userId, String userToken, ApiListener listener) {
+        HashMap<String, String> params = Data.userParams(true, userId, userToken);
+        getApiService().addConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data", "user"));
+    }
+
+    /**
+     * Update user's social connection
+     * @param provider  "facebook" or "twitter"
+     * @param userToken user token from social network
+     * @param listener
+     */
+    public void updateConnection(String provider, String userToken, ApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_token", userToken);
+        getApiService().addConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data", "user"));
+    }
+
+    /**
+     * Delete connection to social account
+     * @param provider "facebook" or "twitter"
+     * @param listener
+     */
+    public void deleteConnection(String provider, ApiListener listener) {
+        getApiService().deleteConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
+                new RestCallback(listener, "data", "user"));
+    }
+
+    /**
+     * Get activities of current user as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener
+     */
+    public void getActivities(ApiListener listener) {
+        getActivities(DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getActivities(HashMap<String, Object> filter, ApiListener listener) {
+        getActivities(DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getActivities(Integer limit, Integer offset, HashMap<String, Object> filter,
+                              ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getActivities(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data", "user", "activity"));
+    }
+
+    /**
+     * Get activities (by user id) as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param userId requested user id
+     * @param listener
+     */
+    public void getActivitiesByUserId(String userId, ApiListener listener) {
+        getActivitiesByUserId(userId, DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getActivitiesByUserId(String userId, HashMap<String, Object> filter, ApiListener listener) {
+        getActivitiesByUserId(userId, DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getActivitiesByUserId(String userId, Integer limit, Integer offset, HashMap<String, Object> filter,
+                              ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getActivitiesByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "user", "activity"));
+    }
+
+    /**
+     * Get followers of current user as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener
+     */
+    public void getFollowers(ApiListener listener) {
+        getFollowers(DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getFollowers(Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getFollowers(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "user", "follower"));
+    }
+
+    /**
+     * Get followers of user as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param userId id of the user whose followings will be returned
+     * @param listener
+     */
+    public void getFollowersByUserId(String userId, ApiListener listener) {
+        getFollowersByUserId(userId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getFollowersByUserId(String userId, Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getFollowersByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "user", "follower"));
+    }
+
+    /**
+     * Follow user with provided id
+     * @param userId requested user id
+     * @param listener
+     * Followings of current user will be returned as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     */
+    public void followUser(String userId, ApiListener listener) {
+        getApiService().followUser(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
+                new RestCallback(true, listener, "data", "user", "following"));
+    }
+
+    /**
+     * Unfollow user with provided id
+     * @param userId requested user id
+     * @param listener
+     * Followings of current user will be returned as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     */
+    public void unfollowUser(String userId, ApiListener listener) {
+        getApiService().unfollowUser(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
+                new RestCallback(true, listener, "data", "user", "following"));
+    }
+
+    /**
+     * Get followings of current user as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener
+     */
+    public void getFollowings(ApiListener listener) {
+        getFollowings(DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getFollowings(Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getFollowings(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "user", "following"));
+    }
+
+    /**
+     * Get followings of user as {@link JsonArray} <br/>
+     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param userId
+     * @param listener
+     */
+    public void getFollowingsByUserId(String userId, ApiListener listener) {
+        getFollowingsByUserId(userId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getFollowingsByUserId(String userId, Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getFollowingsByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "user", "following"));
+    }
+
+
+
+
+
+
 
     //------Brand api methods--------------------------------------------
 

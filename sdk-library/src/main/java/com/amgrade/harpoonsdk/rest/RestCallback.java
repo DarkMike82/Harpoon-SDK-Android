@@ -30,10 +30,10 @@ class RestCallback implements Callback<JsonObject> {
         mKeys = keys;
     }
 
-    public RestCallback(boolean isArray, ApiListener listener, String... keys) {
+    public RestCallback(boolean receiveArray, ApiListener listener, String... keys) {
         mListener = listener;
         mKeys = keys;
-        isArrayResponse = isArray;
+        isArrayResponse = receiveArray;
     }
 
     @Override
@@ -98,11 +98,12 @@ class RestCallback implements Callback<JsonObject> {
     //internal methods
     //---------------------------------------------------------------------
     private JsonElement extractData(String[] keys, JsonObject container) {
-        JsonElement data = null;
-        if (keys!=null) {
-            for (int i = 0; i < keys.length; i++) {
-                data = container.get(keys[i]);
-            }
+        if (keys!=null || keys.length==0) {
+            return null;
+        }
+        JsonElement data = container.get(keys[0]);
+        for (int i = 1; i < keys.length; i++) {
+            data = data.getAsJsonObject().get(keys[i]);
         }
         return data;
     }

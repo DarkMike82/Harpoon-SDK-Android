@@ -2,6 +2,7 @@ package com.amgrade.harpoonsdk.rest.model;
 
 import com.amgrade.harpoonsdk.rest.RestClient;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -43,6 +44,22 @@ public class Data {
         }
         return filter;
     }*/
+
+    //-------------------------------------------------------------------
+    //checkout-data methods
+    //-------------------------------------------------------------------
+
+    public static HashMap<String, Object> checkoutList(String[] ids, Integer[] quantities) {
+        HashMap<String, Object> res = new HashMap<>();
+        ArrayList<Ticket> list = new ArrayList<>();
+        for (int i=0;i<ids.length;i++) {
+            Ticket item = new Ticket(ids[i], quantities[i]);
+            list.add(item);
+        }
+        res.put("ticket", list);
+        return res;
+    }
+
     //-------------------------------------------------------------------
     //user-data methods
     //-------------------------------------------------------------------

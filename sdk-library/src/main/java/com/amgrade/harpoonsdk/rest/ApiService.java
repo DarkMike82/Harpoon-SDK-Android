@@ -23,7 +23,6 @@ interface ApiService {
     //-------------------------------------------------------------------
     //eCommerce api methods
     //-------------------------------------------------------------------
-
     @POST("/{v}/user/{userId}/ecommerce/cart")
     void createCart(@Path("v") String apiVersion, @Path("userId") String user_id, RestCallback callback);
 
@@ -130,7 +129,7 @@ interface ApiService {
     void getEventVenues(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
                         @Query("token") String token, @Body Serializable params, RestCallback callback);
 
-    @GET("/{v}/{userId}/event/{eventId}/checkout")
+    @POST("/{v}/{userId}/event/{eventId}/checkout")
     void checkoutEvent(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
                        @Query("token") String token, @Body Serializable params, RestCallback callback);
 
@@ -195,7 +194,7 @@ interface ApiService {
     void updatePassword(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
                         @Body Serializable params, RestCallback callback);
 
-    @POST("/{v}/{user.id}/user/connection/{provider}/")
+    /*@POST("/{v}/{user.id}/user/connection/{provider}/")
     void addConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
                        @Query("token") String token, @Body Serializable params, RestCallback callback);
 
@@ -205,7 +204,7 @@ interface ApiService {
 
     @DELETE("/{v}/{user.id}/user/connection/{provider}/")
     void deleteConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
-                          @Query("token") String token, RestCallback callback);
+                          @Query("token") String token, RestCallback callback);*/
 
     @GET("/{v}/{user.id}/user/activity/")
     void getActivities(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
@@ -265,13 +264,10 @@ interface ApiService {
     void getCouponTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String id,
                          @Query("token") String token, @Body Serializable params, RestCallback callback);
 
-    @GET("/{v}/{user.id}/user/deal/simple/{simpledeal.id}/ticket/")
-    void getSimpleDealTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("simpledeal.id") String id,
-                              @Query("token") String token, @Body Serializable params, RestCallback callback);
-
-    @GET("/{v}/{user.id}/user/deal/group/{groupdeal.id}/ticket/")
-    void getGroupDealTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("groupdeal.id") String id,
-                              @Query("token") String token, @Body Serializable params, RestCallback callback);
+    @GET("/{v}/{user.id}/user/deal/{deal.type}/{deal.id}/ticket/")
+    void getDealTickets(@Path("v") String apiVersion, @Path("user.id") String userId,
+                        @Path("deal.type") String type, @Path("deal.id") String id,
+                        @Query("token") String token, @Body Serializable params, RestCallback callback);
 
     @GET("/{v}/{user.id}/user/card/")
     void getCards(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
@@ -301,7 +297,6 @@ interface ApiService {
     void getWalletHistory(@Path("v") String apiVersion, @Path("user.id") String userId,
                           @Query("token") String token, @Body Serializable params, RestCallback callback);
 
-
     //-------------------------------------------------------------------
     //Coupon api methods
     //-------------------------------------------------------------------
@@ -317,8 +312,31 @@ interface ApiService {
     void getCouponVenues(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String couponId,
                          @Query("token") String token, @Body Serializable params, RestCallback callback);
 
-    @GET("/{v}/{user.id}/coupon/{coupon.id}/checkout/")
+    @POST("/{v}/{user.id}/coupon/{coupon.id}/checkout/")
     void couponCheckout(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String couponId,
                         @Query("token") String token, @Body Serializable params, RestCallback callback);
+
+    //-------------------------------------------------------------------
+    //Deal api methods
+    //-------------------------------------------------------------------
+    @GET("/{v}/{user.id}/deal/{deal.type}/")
+    void getDeals(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("deal.type") String type,
+                    @Query("token") String token, @Body Serializable params, RestCallback callback);
+
+    @GET("/{v}/{user.id}/deal/{deal.type}/{deal.id}/")
+    void getDealInfo(@Path("v") String apiVersion, @Path("user.id") String userId,
+                     @Path("deal.type") String type, @Path("deal.id") String dealId,
+                       @Query("token") String token, RestCallback callback);
+
+    @GET("/{v}/{user.id}/deal/{deal.type}/{deal.id}/venue/")
+    void getDealVenues(@Path("v") String apiVersion, @Path("user.id") String userId,
+                       @Path("deal.type") String type, @Path("deal.id") String dealId,
+                        @Query("token") String token, @Body Serializable params, RestCallback callback);
+
+    @POST("/{v}/{user.id}/deal/{deal.type}/{deal.id}/checkout/")
+    void dealCheckout(@Path("v") String apiVersion, @Path("user.id") String userId,
+                      @Path("deal.type") String type, @Path("deal.id") String dealId,
+                        @Query("token") String token, @Body Serializable params, RestCallback callback);
+
 
 }

@@ -194,14 +194,14 @@ public class RestClient {
         HashMap<String, String> params = Data.userParams(false, email, pwd);
         getApiService().login(sApiVersion, "email", params, new RestCallback(listener, "data", "user"));
     }
-    public void loginWithFacebook(String fbUserId, String fbUserToken, ApiListener listener) {
+    /*public void loginWithFacebook(String fbUserId, String fbUserToken, ApiListener listener) {
         HashMap<String, String> params = Data.userParams(true, fbUserId, fbUserToken);
         getApiService().login(sApiVersion, "facebook", params, new RestCallback(listener, "data", "user"));
     }
     public void loginWithTwitter(String twUserId, String twUserToken, ApiListener listener) {
         HashMap<String, String> params = Data.userParams(true, twUserId, twUserToken);
         getApiService().login(sApiVersion, "twitter", params, new RestCallback(listener, "data", "user"));
-    }
+    }*/
 
     /**
      * Init password reset for user with provided email<br/>
@@ -245,11 +245,11 @@ public class RestClient {
      * @param userToken user token from social network
      * @param listener
      */
-    public void addConnection(String provider, String userId, String userToken, ApiListener listener) {
+    /*public void addConnection(String provider, String userId, String userToken, ApiListener listener) {
         HashMap<String, String> params = Data.userParams(true, userId, userToken);
         getApiService().addConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
                 params, new RestCallback(listener, "data", "user"));
-    }
+    }*/
 
     /**
      * Update user's social connection
@@ -257,22 +257,22 @@ public class RestClient {
      * @param userToken user token from social network
      * @param listener
      */
-    public void updateConnection(String provider, String userToken, ApiListener listener) {
+    /*public void updateConnection(String provider, String userToken, ApiListener listener) {
         HashMap<String, String> params = new HashMap<>();
         params.put("user_token", userToken);
-        getApiService().addConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
+        getApiService().updateConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
                 params, new RestCallback(listener, "data", "user"));
-    }
+    }*/
 
     /**
      * Delete connection to social account
      * @param provider "facebook" or "twitter"
      * @param listener
      */
-    public void deleteConnection(String provider, ApiListener listener) {
+    /*public void deleteConnection(String provider, ApiListener listener) {
         getApiService().deleteConnection(sApiVersion, HarpoonSDK.getUserId(), provider, HarpoonSDK.getUserToken(),
                 new RestCallback(listener, "data", "user"));
-    }
+    }*/
 
     /**
      * Get activities of current user as {@link JsonArray} <br/>
@@ -468,7 +468,7 @@ public class RestClient {
     }
     public void getSimpleDealTickets(String dealId, Integer limit, Integer offset, ApiListener listener) {
         HashMap<String, Object> params = Data.listParams(limit, offset);
-        getApiService().getSimpleDealTickets(sApiVersion, HarpoonSDK.getUserId(), dealId, HarpoonSDK.getUserToken(),
+        getApiService().getDealTickets(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback(true, listener, "data", "user", "deal", "simple", "ticket"));
     }
 
@@ -477,7 +477,7 @@ public class RestClient {
     }
     public void getGroupDealTickets(String dealId, Integer limit, Integer offset, ApiListener listener) {
         HashMap<String, Object> params = Data.listParams(limit, offset);
-        getApiService().getGroupDealTickets(sApiVersion, HarpoonSDK.getUserId(), dealId, HarpoonSDK.getUserToken(),
+        getApiService().getDealTickets(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback(true, listener, "data", "user", "deal", "group", "ticket"));
     }
 
@@ -780,7 +780,76 @@ public class RestClient {
         HashMap<String, Integer> params = new HashMap<>();
         params.put("qty", quantity);
         getApiService().couponCheckout(sApiVersion, HarpoonSDK.getUserId(), couponId, HarpoonSDK.getUserToken(),
-                params, new RestCallback(true, listener, "data", "coupon", "checkout"));
+                params, new RestCallback(listener, "data", "coupon", "checkout"));
     }
+
+    //------Deal api methods--------------------------------------------
+
+    public void getSimpleDeals(ApiListener listener) {
+        getSimpleDeals(DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getSimpleDeals(HashMap<String, Object> filter, ApiListener listener) {
+        getSimpleDeals(DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getSimpleDeals(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getDeals(sApiVersion, HarpoonSDK.getUserId(), "simple", HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "deal", "simple"));
+    }
+
+    public void getSimpleDealInfo(String dealId, ApiListener listener) {
+        getApiService().getDealInfo(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
+                new RestCallback(listener, "data", "deal", "deal_simple"));
+    }
+
+    public void getSimpleDealVenues(String dealId, ApiListener listener) {
+        getSimpleDealVenues(dealId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getSimpleDealVenues(String dealId, Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getDealVenues(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "deal", "simple", "venue"));
+    }
+
+    public void simpleDealCheckout(String dealId, Integer quantity, ApiListener listener) {
+        HashMap<String, Integer> params = new HashMap<>();
+        params.put("qty", quantity);
+        getApiService().dealCheckout(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data", "deal", "simple", "checkout"));
+    }
+
+    public void getGroupDeals(ApiListener listener) {
+        getGroupDeals(DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getGroupDeals(HashMap<String, Object> filter, ApiListener listener) {
+        getGroupDeals(DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getGroupDeals(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener listener) {
+        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        getApiService().getDeals(sApiVersion, HarpoonSDK.getUserId(), "group", HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "deal", "group"));
+    }
+
+    public void getGroupDealInfo(String dealId, ApiListener listener) {
+        getApiService().getDealInfo(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
+                new RestCallback(listener, "data", "deal", "deal_group"));
+    }
+
+    public void getGroupDealVenues(String dealId, ApiListener listener) {
+        getGroupDealVenues(dealId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getGroupDealVenues(String dealId, Integer limit, Integer offset, ApiListener listener) {
+        HashMap<String, Object> params = Data.listParams(limit, offset);
+        getApiService().getDealVenues(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(true, listener, "data", "deal", "group", "venue"));
+    }
+
+    public void groupDealCheckout(String dealId, Integer quantity, ApiListener listener) {
+        HashMap<String, Integer> params = new HashMap<>();
+        params.put("qty", quantity);
+        getApiService().dealCheckout(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
+                params, new RestCallback(listener, "data", "deal", "group", "checkout"));
+    }
+
 
 }

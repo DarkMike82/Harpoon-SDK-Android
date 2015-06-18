@@ -12,6 +12,10 @@ import java.util.HashMap;
 public class Data {
     private static UserData sUser;
 
+    //-------------------------------------------------------------------
+    //list & filter-data methods
+    //-------------------------------------------------------------------
+
     public static HashMap<String, Object> listParams(Integer limit, Integer offset) {
         HashMap<String, Object> params = new HashMap<>();
         if (limit==null) {
@@ -24,10 +28,6 @@ public class Data {
         params.put("offset", offset);
         return params;
     }
-
-    //-------------------------------------------------------------------
-    //filter-data methods
-    //-------------------------------------------------------------------
 
     public static HashMap<String, Object> listFilterParams(Integer limit, Integer offset, HashMap<String, Object> filter) {
         HashMap<String, Object> params = listParams(limit, offset);
@@ -114,12 +114,16 @@ public class Data {
         sUser.setPicture(mime, base64encodedpicture);
     }
 
+    public static void setCover(String mime, String base64encodedpicture) {
+        sUser.setCover(mime, base64encodedpicture);
+    }
+
     public static void addUserMetadata(String[] keys, Object[] values){
         sUser.addMetadata(keys, values);
     }
 
-    public static void setConnection(String connection_name, String userId, String token) {
-        sUser.setConnection(connection_name, userId, token);
+    public static void setConnection(String connection_name, String userId) {
+        sUser.setConnection(connection_name, userId);
     }
 
     /*public static void setUserLocation(String lat, String lon) {

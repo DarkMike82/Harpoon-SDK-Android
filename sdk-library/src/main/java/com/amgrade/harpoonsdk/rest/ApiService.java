@@ -134,7 +134,8 @@ interface ApiService {
     //User api methods
     //-------------------------------------------------------------------
     @POST("/{v}/user/")
-    void createUser(@Path("v") String apiVersion, @Body Serializable userData, RestCallback callback);
+    void createUser(@Path("v") String apiVersion, @Query("app.token") String token,
+                    @Body Serializable userData, RestCallback callback);
 
 
     @GET("/{v}/{user.id}/")
@@ -154,7 +155,7 @@ interface ApiService {
                     @Body Serializable userData, RestCallback callback);
 
     @POST("/{v}/user/login/{provider}/")
-    void login(@Path("v") String apiVersion, @Path("provider") String provider,
+    void login(@Path("v") String apiVersion, @Path("provider") String provider, @Query("app.token") String token,
                @Body Serializable params, RestCallback callback);
 
     @GET("/{v}/user/password/")

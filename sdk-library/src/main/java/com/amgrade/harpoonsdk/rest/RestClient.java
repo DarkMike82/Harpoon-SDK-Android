@@ -28,12 +28,14 @@ public class RestClient {
     private static String sApiVersion = "v1";
     private static String sAccept = "application/json";
     private static String sContentType = "application/json";
+    private static String sContentType1 = "application/x-www-form-urlencoded";
 
     private static RestClient sInstance;
 
     private static Converter sConverter; //TODO
 
     private ApiService mApiService;
+    private AuthService mAuthService;
 
     /**
      * Singleton to use api client.
@@ -62,16 +64,23 @@ public class RestClient {
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .setEndpoint(BASE_URL)
                 .setConverter(sConverter)
-                .setRequestInterceptor(createInterceptor())
+                .setRequestInterceptor(createInterceptor(false))
                 .build();
         mApiService = restAdapter.create(ApiService.class);
+        RestAdapter authAdapter = new RestAdapter.Builder()
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
+                .setEndpoint(BASE_URL)
+                .setConverter(sConverter)
+                .setRequestInterceptor(createInterceptor(true))
+                .build();
+        mAuthService = authAdapter.create(AuthService.class);
     }
 
     private ApiService getApiService() {
         return mApiService;
     }
 
-    private RequestInterceptor createInterceptor() {
+    private RequestInterceptor createInterceptor(final boolean forAuth) {
         return new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {
@@ -81,7 +90,11 @@ public class RestClient {
 //                request.addHeader("device", null/*?*/); //TODO
 //                request.addHeader("visitor", null/*?*/); //TODO
                 request.addHeader("Accept", sAccept);
-                request.addHeader("Content-Type", sContentType);
+                if (forAuth) {
+                    request.addHeader("Content-Type", sContentType1);
+                } else {
+                    request.addHeader("Content-Type", sContentType);
+                }
             }
         };
     }
@@ -91,6 +104,16 @@ public class RestClient {
     //Rest API facade
     //-----------------------------------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------------------------------------------
+
+    //------Auth api methods--------------------------------------
+
+    public void getAuthToken(ApiListener listener, boolean forUser) {
+        HashMap<String, String> params = new HashMap<>();
+        if (forUser) {
+            params.put("code", HarpoonSDK.getUserAuthCode());
+        }
+        mAuthService.getToken(sApiVersion, params, new AuthCallback(listener));
+    }
 
     //------Application api methods--------------------------------------
 
@@ -153,7 +176,8 @@ public class RestClient {
     //------User api methods--------------------------------------------
 
     public void createUser(ApiListener listener) {
-        getApiService().createUser(sApiVersion, Data.getUser(), new RestCallback(listener, "data", "user"));
+        getApiService().createUser(sApiVersion, HarpoonSDK.getAppToken(), Data.getUser(),
+                new RestCallback(listener, "data", "user"));
     }
 
     public void getUser(ApiListener listener) {
@@ -191,7 +215,8 @@ public class RestClient {
 
     public void login(String email, String pwd, ApiListener listener) {
         HashMap<String, String> params = Data.userParams(false, email, pwd);
-        getApiService().login(sApiVersion, "email", params, new RestCallback(listener, "data", "user"));
+        getApiService().login(sApiVersion, "email", HarpoonSDK.getAppToken(),
+                params, new RestCallback(listener, "data", "user"));
     }
     /*public void loginWithFacebook(String fbUserId, String fbUserToken, ApiListener listener) {
         HashMap<String, String> params = Data.userParams(true, fbUserId, fbUserToken);

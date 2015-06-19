@@ -20,8 +20,8 @@ class RestCallback implements Callback<JsonObject> {
 
     public static final int SET_USER = 1;
 
-    private ApiListener mListener;
-    private String[] mKeys;
+    protected ApiListener mListener;
+    protected String[] mKeys;
     private int mSuccessAction = -1;
     private boolean isArrayResponse = false;
 
@@ -97,7 +97,7 @@ class RestCallback implements Callback<JsonObject> {
     //---------------------------------------------------------------------
     //internal methods
     //---------------------------------------------------------------------
-    private JsonElement extractData(String[] keys, JsonObject container) {
+    protected JsonElement extractData(String[] keys, JsonObject container) {
         if (keys!=null || keys.length==0) {
             return null;
         }

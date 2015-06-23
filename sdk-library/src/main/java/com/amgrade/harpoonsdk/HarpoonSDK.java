@@ -8,8 +8,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
  * Created by michael on 27.05.15.
  */
 public class HarpoonSDK {
-    private static final String TYPE_APP = "application";
-    private static final String TYPE_USER = "user";
+    private static final String TOKEN_APP = "application";
+    private static final String TOKEN_USER = "user";
 
     //app data
     private static String sAppId;
@@ -90,9 +90,9 @@ public class HarpoonSDK {
     }
 
     public static void setToken(String type, String token) {
-        if (type.contentEquals(TYPE_APP)) {
+        if (type.contentEquals(TOKEN_APP)) {
             sAppToken = token;
-        } else if (type.contentEquals(TYPE_USER)) {
+        } else if (type.contentEquals(TOKEN_USER)) {
             sUserToken = token;
         }
     }

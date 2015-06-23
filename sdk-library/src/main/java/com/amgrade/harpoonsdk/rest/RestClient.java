@@ -32,7 +32,8 @@ public class RestClient {
 
     private static RestClient sInstance;
 
-    private static Converter sConverter; //TODO
+    private static Converter sConverter;
+    private static Gson mGson;
 
     private ApiService mApiService;
     private AuthService mAuthService;
@@ -52,13 +53,17 @@ public class RestClient {
         return sConverter;
     }
 
+    public static Gson getGson() {
+        return mGson;
+    }
+
     private RestClient() {
         if (sConverter == null) {
-            Gson gson = new GsonBuilder()
+            mGson = new GsonBuilder()
                     .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
                     .setDateFormat(DATE_FORMAT)
                     .create();
-            sConverter = new GsonConverter(gson);
+            sConverter = new GsonConverter(mGson);
         }
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
@@ -78,6 +83,10 @@ public class RestClient {
 
     private ApiService getApiService() {
         return mApiService;
+    }
+
+    private AuthService getAuthService() {
+        return mAuthService;
     }
 
     private RequestInterceptor createInterceptor(final boolean forAuth) {
@@ -112,7 +121,7 @@ public class RestClient {
         if (forUser) {
             params.put("code", HarpoonSDK.getUserAuthCode());
         }
-        mAuthService.getToken(sApiVersion, params, new AuthCallback(listener));
+        getAuthService().getToken(sApiVersion, params, new AuthCallback(listener));
     }
 
     //------Application api methods--------------------------------------

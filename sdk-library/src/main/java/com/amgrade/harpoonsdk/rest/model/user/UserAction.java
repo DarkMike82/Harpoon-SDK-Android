@@ -1,4 +1,4 @@
-package com.amgrade.harpoonsdk.rest.model;
+package com.amgrade.harpoonsdk.rest.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,8 +6,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
+ * User Activity Model (user feed)<br/>
  * Created by michael on 23.06.15.
  */
 public class UserAction implements Serializable {
@@ -22,6 +24,9 @@ public class UserAction implements Serializable {
 
     @SerializedName("cover")
     private String mCover;
+
+    @SerializedName("related")
+    private HashMap<String, String> mRelatedIds;
 
     @SerializedName("link")
     private String mLink;
@@ -56,6 +61,10 @@ public class UserAction implements Serializable {
 
     public String getCover() {
         return mCover;
+    }
+
+    public HashMap<String, String> getRelatedIds() {
+        return mRelatedIds;
     }
 
     public String getLink() {

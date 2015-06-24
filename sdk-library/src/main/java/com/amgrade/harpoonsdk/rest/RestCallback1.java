@@ -18,12 +18,14 @@ import retrofit.converter.ConversionException;
 import retrofit.mime.TypedInput;
 
 /**
+ * Generic callback for Harpoon server requests.<br/>
  * Created by michael on 22.06.15.
+ * @param <T> type of data to receive from server.
  */
 class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
     private static final String OK = "success";
 
-    public static final int SET_USER = 1;
+    public static final int SET_USER_ID = 1;
 
     protected ApiListener1<T> mListener;
     protected String[] mKeys;
@@ -147,9 +149,9 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
 
     private void performAction(int action, JsonObject data) {
         switch (action) {
-            case SET_USER:
+            case SET_USER_ID:
                 HarpoonSDK.setUser(data.get("id").getAsString(),
-                        data.get("token").getAsString());
+                        data.get("authorization_code").getAsString());
                 break;
             default:
                 break;

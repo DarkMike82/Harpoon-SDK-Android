@@ -23,7 +23,7 @@ public class HarpoonSDK {
     private static String sUserToken;
 
     //brand data
-    private static int sBrandId;
+//    private static int sBrandId;
 
     private static Context sContext;
     private static MaterialDialog sMessageDialog;
@@ -55,23 +55,39 @@ public class HarpoonSDK {
         }
     }*/
 
-    /*public static void setBrand(int brand_id) {
-        sBrandId = brand_id;
+    /*public static String getApiVersion() {
+        return sApiVersion;
     }*/
 
     /**
-     * Set user credentials to use in requests
-     * @param id
-     * @param token
+     * Save data of validated user (after creation or login)
+     * @param id user ID
+     * @param auth_code authentication code (to exchange for token)
      */
-    public static void setUser(String id, String token) {
+    public static void setUser(String id, String auth_code) {
         sUserId = id;
-        sUserToken = token;
+        sUserAuthCode = auth_code;
     }
 
-//    public static String getApiVersion() {
-//        return sApiVersion;
-//    }
+    /**
+     * Remove unneeded auth_code (e.g. when token is received)
+     */
+    public static void clearAuthCode() {
+        sUserAuthCode = null;
+    }
+
+    /**
+     * Save token (for later use in auth).
+     * @param type either {@link #TOKEN_APP} or {@link #TOKEN_USER}.
+     * @param token token value.
+     */
+    public static void setToken(String type, String token) {
+        if (type.contentEquals(TOKEN_APP)) {
+            sAppToken = token;
+        } else if (type.contentEquals(TOKEN_USER)) {
+            sUserToken = token;
+        }
+    }
 
     public static String getAppId() {
         return sAppId;
@@ -87,14 +103,6 @@ public class HarpoonSDK {
 
     public static String getAppToken() {
         return sAppToken;
-    }
-
-    public static void setToken(String type, String token) {
-        if (type.contentEquals(TOKEN_APP)) {
-            sAppToken = token;
-        } else if (type.contentEquals(TOKEN_USER)) {
-            sUserToken = token;
-        }
     }
 
     public static String getUserId() {

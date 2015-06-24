@@ -51,9 +51,9 @@ public class Data {
 
     public static HashMap<String, Object> checkoutList(String[] ids, Integer[] quantities) {
         HashMap<String, Object> res = new HashMap<>();
-        ArrayList<Ticket> list = new ArrayList<>();
+        ArrayList<Ticket1> list = new ArrayList<>();
         for (int i=0;i<ids.length;i++) {
-            Ticket item = new Ticket(ids[i], quantities[i]);
+            Ticket1 item = new Ticket1(ids[i], quantities[i]);
             list.add(item);
         }
         res.put("ticket", list);
@@ -64,15 +64,15 @@ public class Data {
     //user-data methods
     //-------------------------------------------------------------------
 
-    public static HashMap<String, String> userParams(boolean social, String... data) {
+    public static HashMap<String, String> userParams(/*boolean social,*/ String... data) {
         HashMap<String, String> params = new HashMap<>();
-        if (social) {
-            params.put("user_id", data[0]);
-            params.put("user_token", data[1]);
-        } else {
+//        if (social) {
+//            params.put("user_id", data[0]);
+//            params.put("user_token", data[1]);
+//        } else {
             params.put("email", data[0]);
             params.put("password", data[1]);
-        }
+//        }
         return params;
     }
 

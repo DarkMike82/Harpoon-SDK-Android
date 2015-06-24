@@ -1,4 +1,4 @@
-package com.amgrade.harpoonsdk.rest.model;
+package com.amgrade.harpoonsdk.rest.model.brand;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -8,9 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Brand Follower Model<br/>
  * Created by michael on 23.06.15.
  */
-public class UserFollower implements Serializable {
+public class BrandFollower implements Serializable {
     @SerializedName("id")
     private String mId;
 
@@ -35,7 +36,7 @@ public class UserFollower implements Serializable {
     private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
 
 
-    public UserFollower() {
+    public BrandFollower() {
     }
 
     public String getId() {

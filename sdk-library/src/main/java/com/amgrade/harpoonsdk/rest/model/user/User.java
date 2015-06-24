@@ -1,4 +1,4 @@
-package com.amgrade.harpoonsdk.rest.model;
+package com.amgrade.harpoonsdk.rest.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
+ * User Model<br/>
  * Created by michael on 23.06.15.
  */
 public class User implements Serializable {
@@ -40,7 +41,7 @@ public class User implements Serializable {
     private String mCover;
 
     @SerializedName("metadata")
-    private HashMap<String, Object> mMetadata;
+    private HashMap<String, ? extends Serializable> mMetadata;
 
     @SerializedName("connection")
     private HashMap<String, HashMap<String, String>> mConnections;
@@ -106,7 +107,7 @@ public class User implements Serializable {
         return mCover;
     }
 
-    public HashMap<String, Object> getMetadata() {
+    public HashMap<String, ? extends Serializable> getMetadata() {
         return mMetadata;
     }
 

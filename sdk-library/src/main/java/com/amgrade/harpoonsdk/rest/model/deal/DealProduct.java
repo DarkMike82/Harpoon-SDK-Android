@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Product attached to a deal
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class DealProduct {
     @SerializedName("id")

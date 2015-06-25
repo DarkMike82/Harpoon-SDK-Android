@@ -13,42 +13,43 @@ import retrofit.client.Response;
 import retrofit.converter.ConversionException;
 
 /**
- * Created by michael on 03.06.15.
+ * Callback for requests without model.
+ * Created by Michael Dontsov on 03.06.15.
  */
 class RestCallback implements Callback<JsonObject> {
     private static final String OK = "success";
 
-    public static final int SET_USER = 1;
+//    public static final int SET_USER = 1;
 
     protected ApiListener mListener;
     protected String[] mKeys;
-    private int mSuccessAction = -1;
-    private boolean isArrayResponse = false;
+//    private int mSuccessAction = -1;
+//    private boolean isArrayResponse = false;
 
     public RestCallback(ApiListener listener, String... keys) {
         mListener = listener;
         mKeys = keys;
     }
 
-    public RestCallback(boolean receiveArray, ApiListener listener, String... keys) {
+    /*public RestCallback(boolean receiveArray, ApiListener listener, String... keys) {
         mListener = listener;
         mKeys = keys;
         isArrayResponse = receiveArray;
-    }
+    }*/
 
     @Override
     public void success(JsonObject jsonObject, Response response) {
         //since 09.06.2015 API settings changed, so only "success" responses will be processed here
         JsonElement responseData = extractData(mKeys, jsonObject);
-        performAction(mSuccessAction, responseData.getAsJsonObject());
+//        performAction(mSuccessAction, responseData.getAsJsonObject());
         if (responseData==null) {
             mListener.onSuccess();
         } else {
-            if (isArrayResponse) {
-                mListener.onSuccess(responseData.getAsJsonArray());
-            } else {
+//            if (isArrayResponse) {
+//                mListener.onSuccess(responseData.getAsJsonArray());
+//            } else {
                 mListener.onSuccess(responseData.getAsJsonObject());
-            }
+//            }
         }
     }
 
@@ -90,9 +91,9 @@ class RestCallback implements Callback<JsonObject> {
         mListener.onError(errorInfo[0], errorInfo[1]);
     }
 
-    public void setOnSuccessAction(int action) {
-        mSuccessAction = action;
-    }
+//    public void setOnSuccessAction(int action) {
+//        mSuccessAction = action;
+//    }
 
     //---------------------------------------------------------------------
     //internal methods
@@ -117,7 +118,7 @@ class RestCallback implements Callback<JsonObject> {
         return errorInfo;
     }
 
-    private void performAction(int action, JsonObject data) {
+    /*private void performAction(int action, JsonObject data) {
         switch (action) {
             case SET_USER:
                 HarpoonSDK.setUser(data.get("id").getAsString(),
@@ -126,9 +127,12 @@ class RestCallback implements Callback<JsonObject> {
             default:
                 break;
         }
-    }
+    }*/
 
     private String getString(int resId) {
+        if (HarpoonSDK.getContext()==null) {
+            throw new NullPointerException("SDK context is not initialised!");
+        }
         return HarpoonSDK.getContext().getString(resId);
     }
 }

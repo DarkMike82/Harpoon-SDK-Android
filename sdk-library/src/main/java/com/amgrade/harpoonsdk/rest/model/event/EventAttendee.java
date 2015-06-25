@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * Event Attendee Model<br/>
- * Created by michael on 23.06.15.
+ * Created by Michael Dontsov on 23.06.15.
  */
 public class EventAttendee implements Serializable {
     @SerializedName("id")

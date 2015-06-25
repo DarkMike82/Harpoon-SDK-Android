@@ -11,7 +11,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 
 /**
- * Created by michael on 27.05.15.
+ * Created by Michael Dontsov on 27.05.15.
  */
 class JsonTypeAdapterFactory implements TypeAdapterFactory {
     @Override

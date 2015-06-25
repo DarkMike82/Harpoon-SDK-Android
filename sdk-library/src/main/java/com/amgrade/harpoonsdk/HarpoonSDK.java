@@ -1,11 +1,13 @@
 package com.amgrade.harpoonsdk;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
 /**
- * Created by michael on 27.05.15.
+ * Created by Michael Dontsov on 27.05.15.
  */
 public class HarpoonSDK {
     private static final String TOKEN_APP = "application";
@@ -30,10 +32,11 @@ public class HarpoonSDK {
 
     /**
      * Init basic SDK params
-     * @param context used to show info/error messages. Please provide Application or AppContext (not Activity) to avoid NPE if Activity is closed.
+     * @param context used to display info/error messages. Please provide application context<br/>
+     * ({@link Application} or {@link Activity#getApplicationContext()}), not {@link Activity} to avoid NPE if Activity is closed.
      * @param appId AppId for your app on https://brand.harpoonconnect.com/
      * @param appSecret Secret for your app on https://brand.harpoonconnect.com/
-     * @param appBundle bundle id for your app ("package" in AndroidManifest.xml or "applicationId" in build.gradle)
+     * @param appBundle bundle id for your app ("package" in {@code AndroidManifest.xml} or "applicationId" in {@code build.gradle})
      */
     public static void init(Context context, String appId, String appSecret, String appBundle) {
         sContext = context;

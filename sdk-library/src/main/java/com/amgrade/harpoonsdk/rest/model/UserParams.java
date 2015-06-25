@@ -3,19 +3,19 @@ package com.amgrade.harpoonsdk.rest.model;
 import java.util.HashMap;
 
 /**
- * Created by michael on 04.06.15.
+ * Created by Michael Dontsov on 04.06.15.
  */
-class UserData extends HashMap<String, Object> {
+class UserParams extends HashMap<String, Object> {
 
     private HashMap<String, Object> mMetadata;
     private HashMap<String, String> mPicture;
     private HashMap<String, Object> mConnection;
 
-    public UserData() {
+    public UserParams() {
         super();
     }
 
-    public UserData(String... data) {
+    public UserParams(String... data) {
         super();
         this.put("email", data[0]);
         this.put("password", data[1]);
@@ -76,6 +76,22 @@ class UserData extends HashMap<String, Object> {
         user.put("user_id", userId);
         mConnection.put(connection_name, user);
         this.put("connection", mConnection);
+    }
+
+    public void requestAuthCodeForUser(boolean needAuthCode) {
+        if (needAuthCode) {
+            this.put("response_type", "code");
+        } else {
+            this.remove("response_type");
+        }
+    }
+
+    public void setRandomString(String text) {
+        if (text!=null) {
+            this.put("random", text);
+        } else {
+            this.remove("random");
+        }
     }
 
 }

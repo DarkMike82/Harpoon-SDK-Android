@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  * User Notification Model<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class UserNotification implements Serializable {
     @SerializedName("id")

@@ -11,7 +11,7 @@ import java.util.Date;
 
 /**
  * Group Deal Model<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class GroupDeal implements Serializable {
     @SerializedName("id")

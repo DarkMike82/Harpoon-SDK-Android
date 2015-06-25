@@ -15,11 +15,10 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.converter.ConversionException;
-import retrofit.mime.TypedInput;
 
 /**
  * Generic callback for Harpoon server requests.<br/>
- * Created by michael on 22.06.15.
+ * Created by Michael Dontsov on 22.06.15.
  * @param <T> type of data to receive from server.
  */
 class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
@@ -49,37 +48,24 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
         //since 09.06.2015 API settings changed, so only "success" responses will be processed here
         JsonElement responseData = extractData(mKeys, jsonObject);
         performAction(mSuccessAction, responseData.getAsJsonObject());
-        if (responseData==null) {
-            mListener.onSuccess();
-        } else {
-            TypedInput objectData;
+//        if (responseData==null) {
+//            mListener.onSuccess();
+//        } else {
             if (isArrayResponse) {
                 JsonArray array = responseData.getAsJsonArray();
                 ArrayList<T> parsedArray = new ArrayList<>();
                 for (int i=0;i<array.size();i++) {
-                    T item = null;
-                    objectData = new JsonTypedInput(array.get(i));
-                    try {
-                        item = (T) RestClient.getConverter().fromBody(objectData, mDataClass);
-                    } catch (ConversionException e) {
-                        Log.e("Response conversion", e.getLocalizedMessage());
-                    }
+                    T item = parseJson(new JsonTypedInput(array.get(i)));
                     if (item!=null) {
                         parsedArray.add(item);
                     }
                 }
                 mListener.onSuccess(parsedArray);
             } else {
-                objectData = new JsonTypedInput(responseData);
-                T parsedObject = null;
-                try {
-                    parsedObject = (T) RestClient.getConverter().fromBody(objectData, mDataClass);
-                } catch (ConversionException e) {
-                    Log.e("Response conversion", e.getLocalizedMessage());
-                }
+                T parsedObject = parseJson(new JsonTypedInput(responseData));
                 mListener.onSuccess(parsedObject);
             }
-        }
+//        }
     }
 
     @Override
@@ -159,6 +145,19 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
     }
 
     private String getString(int resId) {
+        if (HarpoonSDK.getContext()==null) {
+            throw new NullPointerException("SDK context is not initialised!");
+        }
         return HarpoonSDK.getContext().getString(resId);
+    }
+
+    private T parseJson(JsonTypedInput input) {
+        T parsedObject = null;
+        try {
+            parsedObject = (T) RestClient.getConverter().fromBody(input, mDataClass);
+        } catch (ConversionException e) {
+            Log.e("Response conversion", e.getLocalizedMessage());
+        }
+        return parsedObject;
     }
 }

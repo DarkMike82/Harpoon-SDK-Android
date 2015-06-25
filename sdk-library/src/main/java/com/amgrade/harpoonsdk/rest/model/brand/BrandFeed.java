@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  * Brand Feed Model<br/>
- * Created by michael on 23.06.15.
+ * Created by Michael Dontsov on 23.06.15.
  */
 public class BrandFeed implements Serializable {
     @SerializedName("id")

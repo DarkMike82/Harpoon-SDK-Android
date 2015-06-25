@@ -3,7 +3,7 @@ package com.amgrade.harpoonsdk.rest;
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.rest.model.Checkout;
 import com.amgrade.harpoonsdk.rest.model.Coupon;
-import com.amgrade.harpoonsdk.rest.model.Data;
+import com.amgrade.harpoonsdk.rest.model.ParamsHelper;
 import com.amgrade.harpoonsdk.rest.model.Venue;
 import com.amgrade.harpoonsdk.rest.model.brand.Brand;
 import com.amgrade.harpoonsdk.rest.model.brand.BrandFeed;
@@ -22,7 +22,6 @@ import com.amgrade.harpoonsdk.rest.model.user.UserFollower;
 import com.amgrade.harpoonsdk.rest.model.user.UserFollowing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ import retrofit.converter.GsonConverter;
 //import retrofit.converter.SimpleXMLConverter;
 
 /**
- * Created by michael on 26.05.15.
+ * Created by Michael Dontsov on 26.05.15.
  */
 public class RestClient {
     //api settings
@@ -138,8 +137,9 @@ public class RestClient {
 
     /**
      * Authenticate application or user, and receive token for further requests.<br/>
-     * Token will be returned as {@link JsonObject} containing token value,
-     * type and amount of seconds before the token expires ("token", "type", "expires_in" fields).
+     * Token will be returned as {@link JsonObject} containing token value,<br/>
+     * type and amount of seconds before the token expires ("token", "type", "expires_in" fields).<br/>
+     * Token is automatically stored in SDK, no need to do it yourself.
      * @param listener listener for result. {@link ApiListener#onSuccess(JsonObject)} is called on successful response.
      * @param forUser {@code true} if you want to get access token for user, {@code false} otherwise.
      */
@@ -217,8 +217,12 @@ public class RestClient {
 
     //------User api methods--------------------------------------------
 
+    /**
+     * Register new user (information is taken from {@link ParamsHelper}).
+     * @param listener listener for result.
+     */
     public void createUser(ApiListener1<User> listener) {
-        getApiService().createUser(sApiVersion, HarpoonSDK.getAppToken(), Data.getUser(),
+        getApiService().createUser(sApiVersion, HarpoonSDK.getAppToken(), ParamsHelper.getUser(),
                 new RestCallback1<>(User.class, listener, "data", "user"));
     }
 
@@ -245,18 +249,27 @@ public class RestClient {
         getUsers(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getUsers(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener1<User> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getUsers(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(), params,
                 new RestCallback1<>(User.class, true, listener, "data", "user"));
     }
 
     public void updateUser(ApiListener1<User> listener) {
         getApiService().updateUser(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
-                Data.getUser(), new RestCallback1<>(User.class, listener, "data", "user"));
+                ParamsHelper.getUser(), new RestCallback1<>(User.class, listener, "data", "user"));
     }
 
+    /**
+     * Validate user's email and password to enter the app. User data including {@code auth_code} will be returned on success<br/>
+     * (in {@code listener.onSuccess(User)} method).<br/>
+     * {@code auth_code} is automatically stored in SDK, hence you need to call {@link #getAuthToken(ApiListener, boolean)}<br/>
+     * (with {@code true} as a second parameter) to load access token for further API requests
+     * @param email user email
+     * @param pwd   password
+     * @param listener listener for result.
+     */
     public void login(String email, String pwd, ApiListener1<User> listener) {
-        HashMap<String, String> params = Data.userParams(email, pwd);
+        HashMap<String, String> params = ParamsHelper.userParams(email, pwd);
         RestCallback1<User> callback = new RestCallback1<>(User.class, listener, "data", "user");
         callback.setOnSuccessAction(RestCallback1.SET_USER_ID);
         getApiService().login(sApiVersion, "email", HarpoonSDK.getAppToken(),
@@ -275,18 +288,18 @@ public class RestClient {
      * Init password reset for user with provided email<br/>
      * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
      * @param email email of user to reset password for
-     * @param listener
+     * @param listener listener for result.
      */
     public void resetPassword(String email, ApiListener listener) {
         HashMap<String, String> params = new HashMap<>();
         params.put("email", email);
-        getApiService().resetPassword(sApiVersion, params, new RestCallback(listener, "data"));
+        getApiService().resetPassword(sApiVersion, HarpoonSDK.getUserToken(), params, new RestCallback(listener, "data"));
     }
 
     /**
      * Init password reset for current user<br/>
      * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
-     * @param listener
+     * @param listener listener for result.
      */
     public void resetPasswordForCurrentUser(ApiListener listener) {
         getApiService().resetPasswordWithAuth(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
@@ -298,10 +311,10 @@ public class RestClient {
      * No data will be returned, {@link ApiListener#onSuccess()} will be called on success
      * @param cur_pwd   current password
      * @param new_pwd   new password
-     * @param listener
+     * @param listener listener for result.
      */
     public void updatePassword(String cur_pwd, String new_pwd, ApiListener listener) {
-        HashMap<String, String> params = Data.pwdParams(cur_pwd, new_pwd);
+        HashMap<String, String> params = ParamsHelper.pwdParams(cur_pwd, new_pwd);
         getApiService().updatePassword(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                                               params, new RestCallback(listener, "data"));
     }
@@ -343,9 +356,10 @@ public class RestClient {
     }*/
 
     /**
-     * Get activities of current user as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
-     * @param listener
+     * Get activities of current user as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserAction>)} will be called on success<br/>
+     * Other method implementations use filter (as {@link HashMap} of criterias), limit and offset for pagination.
+     * @param listener listener for result
      */
     public void getActivities(ApiListener1<UserAction> listener) {
         getActivities(DEF_LIMIT, DEF_OFFSET, null, listener);
@@ -355,16 +369,17 @@ public class RestClient {
     }
     public void getActivities(Integer limit, Integer offset, HashMap<String, Object> filter,
                               ApiListener1<UserAction> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getActivities(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserAction.class, true, listener, "data", "user", "activity"));
     }
 
     /**
-     * Get activities (by user id) as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * Get activities (by user id) as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserAction>)} will be called on success<br/>
+     * Other method implementations use filter (as {@link HashMap} of criterias), limit and offset for pagination.
      * @param userId requested user id
-     * @param listener
+     * @param listener listener for result.
      */
     public void getActivitiesByUserId(String userId, ApiListener1<UserAction> listener) {
         getActivitiesByUserId(userId, DEF_LIMIT, DEF_OFFSET, null, listener);
@@ -374,46 +389,48 @@ public class RestClient {
     }
     public void getActivitiesByUserId(String userId, Integer limit, Integer offset, HashMap<String, Object> filter,
                               ApiListener1<UserAction> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getActivitiesByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserAction.class, true, listener, "data", "user", "activity"));
     }
 
     /**
-     * Get followers of current user as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
-     * @param listener
+     * Get followers of current user as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollower>)} will be called on success<br/>
+     * Other method implementation use limit and offset for pagination.
+     * @param listener listener for result.
      */
     public void getFollowers(ApiListener1<UserFollower> listener) {
         getFollowers(DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getFollowers(Integer limit, Integer offset, ApiListener1<UserFollower> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getFollowers(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserFollower.class, true, listener, "data", "user", "follower"));
     }
 
     /**
-     * Get followers of user as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * Get followers of user as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollower>)} will be called on success<br/>
+     * Other method implementation use limit and offset for pagination.
      * @param userId id of the user whose followings will be returned
-     * @param listener
+     * @param listener listener for result.
      */
     public void getFollowersByUserId(String userId, ApiListener1<UserFollower> listener) {
         getFollowersByUserId(userId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getFollowersByUserId(String userId, Integer limit, Integer offset, ApiListener1<UserFollower> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getFollowersByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserFollower.class, true, listener, "data", "user", "follower"));
     }
 
     /**
-     * Follow user with provided id
+     * Follow user with provided id<br/>
+     * Followings of current user will be returned as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollowing>)} will be called on success
      * @param userId requested user id
-     * @param listener
-     * Followings of current user will be returned as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener listener for result.
      */
     public void followUser(String userId, ApiListener1<UserFollowing> listener) {
         getApiService().followUser(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
@@ -421,11 +438,11 @@ public class RestClient {
     }
 
     /**
-     * Unfollow user with provided id
+     * Unfollow user with provided id<br/>
+     * Followings of current user will be returned as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollowing>)} will be called on success
      * @param userId requested user id
-     * @param listener
-     * Followings of current user will be returned as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
+     * @param listener listener for result.
      */
     public void unfollowUser(String userId, ApiListener1<UserFollowing> listener) {
         getApiService().unfollowUser(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
@@ -433,30 +450,32 @@ public class RestClient {
     }
 
     /**
-     * Get followings of current user as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
-     * @param listener
+     * Get followings of current user as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollowing>)} will be called on success<br/>
+     * Other method implementation use limit and offset for pagination.
+     * @param listener listener for result.
      */
     public void getFollowings(ApiListener1<UserFollowing> listener) {
         getFollowings(DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getFollowings(Integer limit, Integer offset, ApiListener1<UserFollowing> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getFollowings(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserFollowing.class, true, listener, "data", "user", "following"));
     }
 
     /**
-     * Get followings of user as {@link JsonArray} <br/>
-     * {@link ApiListener#onSuccess(JsonArray)} will be called on success
-     * @param userId
-     * @param listener
+     * Get followings of user as {@link ArrayList} <br/>
+     * {@link ApiListener1#onSuccess(ArrayList<UserFollowing>)} will be called on success<br/>
+     * Other method implementation use limit and offset for pagination.
+     * @param userId requested user id
+     * @param listener listener for result.
      */
     public void getFollowingsByUserId(String userId, ApiListener1<UserFollowing> listener) {
         getFollowingsByUserId(userId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getFollowingsByUserId(String userId, Integer limit, Integer offset, ApiListener1<UserFollowing> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getFollowingsByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserFollowing.class, true, listener, "data", "user", "following"));
     }
@@ -469,7 +488,7 @@ public class RestClient {
     }
     public void getAttendingEvents(Integer limit, Integer offset, HashMap<String, Object> filter,
                                    ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getAttendingEvents(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "event"));
     }
@@ -481,8 +500,8 @@ public class RestClient {
         getAttendingEventsByUserId(userId, DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getAttendingEventsByUserId(String userId, Integer limit, Integer offset, HashMap<String, Object> filter,
-                                   ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+                                           ApiListener1<Event> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getAttendingEventsByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "event"));
     }
@@ -494,8 +513,8 @@ public class RestClient {
         getAttendedEvents(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getAttendedEvents(Integer limit, Integer offset, HashMap<String, Object> filter,
-                                   ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+                                  ApiListener1<Event> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getAttendedEvents(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "event"));
     }
@@ -507,8 +526,8 @@ public class RestClient {
         getAttendingEventsByUserId(userId, DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getAttendedEventsByUserId(String userId, Integer limit, Integer offset, HashMap<String, Object> filter,
-                                   ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+                                          ApiListener1<Event> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getAttendedEventsByUserId(sApiVersion, HarpoonSDK.getUserId(), userId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "event"));
     }
@@ -517,7 +536,7 @@ public class RestClient {
         getEventTickets(eventId, null, null, listener);
     }
     public void getEventTickets(String eventId, Integer limit, Integer offset, ApiListener1<UserEventTicket> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getEventTickets(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserEventTicket.class, true, listener, "data", "user", "event", "ticket"));
     }
@@ -526,7 +545,7 @@ public class RestClient {
         getCouponTickets(couponId, null, null, listener);
     }
     public void getCouponTickets(String couponId, Integer limit, Integer offset, ApiListener1<UserCouponTicket> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getCouponTickets(sApiVersion, HarpoonSDK.getUserId(), couponId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserCouponTicket.class, true, listener, "data", "user", "coupon", "ticket"));
     }
@@ -535,7 +554,7 @@ public class RestClient {
         getSimpleDealTickets(dealId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getSimpleDealTickets(String dealId, Integer limit, Integer offset, ApiListener1<UserDealTicket> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getDealTickets(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserDealTicket.class, true, listener, "data", "user", "deal", "simple", "ticket"));
     }
@@ -544,7 +563,7 @@ public class RestClient {
         getGroupDealTickets(dealId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getGroupDealTickets(String dealId, Integer limit, Integer offset, ApiListener1<UserDealTicket> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getDealTickets(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserDealTicket.class, true, listener, "data", "user", "deal", "group", "ticket"));
     }
@@ -553,7 +572,7 @@ public class RestClient {
         getCards(DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getCards(Integer limit, Integer offset, ApiListener1<UserCard> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getCards(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(UserCard.class, true, listener, "data", "user", "card"));
     }
@@ -582,7 +601,7 @@ public class RestClient {
         getCurrentWallet(DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getCurrentWallet(Integer limit, Integer offset, ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getCurrentWallet(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "wallet", "current"));
     }
@@ -591,11 +610,58 @@ public class RestClient {
         getWalletHistory(DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getWalletHistory(Integer limit, Integer offset, ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getWalletHistory(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Event.class, true, listener, "data", "user", "wallet", "history"));
     }
 
+
+    //------Event api methods--------------------------------------------
+
+    public void getEvents(ApiListener1<Event> listener) {
+        getEvents(DEF_LIMIT, DEF_OFFSET, null, listener);
+    }
+    public void getEvents(HashMap<String, Object> filter, ApiListener1<Event> listener) {
+        getEvents(DEF_LIMIT, DEF_OFFSET, filter, listener);
+    }
+    public void getEvents(Integer limit, Integer offset,
+                          HashMap<String, Object> filter, ApiListener1<Event> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
+        getApiService().getEvents(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
+                params, new RestCallback1<>(Event.class, true, listener, "data", "event"));
+    }
+
+    public void getEventInfo(String eventId, ApiListener1<Event> listener) {
+        getApiService().getEventInfo(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
+                new RestCallback1<>(Event.class, listener, "data", "event"));
+    }
+
+    public void getEventAttendees(String eventId, ApiListener1<EventAttendee> listener) {
+        getEventAttendees(eventId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getEventAttendees(String eventId, Integer limit, Integer offset,
+                                  ApiListener1<EventAttendee> listener) {
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
+        getApiService().getEventAttendees(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
+                params, new RestCallback1<>(EventAttendee.class, true, listener, "data", "event", "attendee"));
+    }
+
+    public void getEventVenues(String eventId, ApiListener1<Venue> listener) {
+        getEventVenues(eventId, DEF_LIMIT, DEF_OFFSET, listener);
+    }
+    public void getEventVenues(String eventId, Integer limit, Integer offset,
+                               ApiListener1<Venue> listener) {
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
+        getApiService().getEventVenues(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
+                params, new RestCallback1<>(Venue.class, true, listener, "data", "event", "venue"));
+    }
+
+    public void eventCheckout(String[] ids, Integer[] quantities, String eventId,
+                              ApiListener1<Checkout> listener) {
+        HashMap<String, Object> params = ParamsHelper.checkoutList(ids, quantities);
+        getApiService().eventCheckout(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
+                params, new RestCallback1<>(Checkout.class, listener, "data", "event", "checkout"));
+    }
 
     //------Brand api methods--------------------------------------------
 
@@ -606,7 +672,7 @@ public class RestClient {
         getBrands(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getBrands(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener1<Brand> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getBrands(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Brand.class, true, listener, "data", "brand"));
     }
@@ -630,9 +696,9 @@ public class RestClient {
         getBrandFollowers(brandId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getBrandFollowers(Integer brandId, Integer limit, Integer offset, ApiListener1<BrandFollower> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getBrandFollowers(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-               params, new RestCallback1<>(BrandFollower.class, true, listener, "data", "brand", "follower"));
+                params, new RestCallback1<>(BrandFollower.class, true, listener, "data", "brand", "follower"));
     }
 
     public void getBrandFeed(Integer brandId, ApiListener1<BrandFeed> listener) {
@@ -643,18 +709,18 @@ public class RestClient {
     }
     public void getBrandFeed(Integer brandId, Integer limit, Integer offset, HashMap<String, Object> filter,
                              ApiListener1<BrandFeed> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getBrandFeed(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-              params, new RestCallback1<>(BrandFeed.class, true, listener, "data", "brand", "feed"));
+                params, new RestCallback1<>(BrandFeed.class, true, listener, "data", "brand", "feed"));
     }
 
     public void getBrandVenues(Integer brandId, ApiListener1<Venue> listener) {
         getBrandVenues(brandId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getBrandVenues(Integer brandId, Integer limit, Integer offset, ApiListener1<Venue> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getBrandVenues(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-              params, new RestCallback1<>(Venue.class, true, listener, "data", "brand", "venue"));
+                params, new RestCallback1<>(Venue.class, true, listener, "data", "brand", "venue"));
     }
 
     public void getBrandEvents(Integer brandId, ApiListener1<Event> listener) {
@@ -663,11 +729,11 @@ public class RestClient {
     public void getBrandEvents(Integer brandId, HashMap<String, Object> filter, ApiListener1<Event> listener) {
         getBrandEvents(brandId, DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
-    public void getBrandEvents(Integer brandId, Integer limit, Integer offset,
-                               HashMap<String, Object> filter, ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+    public void getBrandEvents(Integer brandId, Integer limit, Integer offset, HashMap<String, Object> filter,
+                               ApiListener1<Event> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getBrandEvents(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-               params, new RestCallback1<>(Event.class, true, listener, "data", "brand", "event"));
+                params, new RestCallback1<>(Event.class, true, listener, "data", "brand", "event"));
     }
 
     public void getBrandOffers(Integer brandId, ApiListener1<Coupon> listener) {
@@ -676,11 +742,11 @@ public class RestClient {
     public void getBrandOffers(Integer brandId, HashMap<String, Object> filter, ApiListener1<Coupon> listener) {
         getBrandOffers(brandId, DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
-    public void getBrandOffers(Integer brandId, Integer limit, Integer offset,
-                               HashMap<String, Object> filter, ApiListener1<Coupon> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+    public void getBrandOffers(Integer brandId, Integer limit, Integer offset, HashMap<String, Object> filter,
+                               ApiListener1<Coupon> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getBrandOffers(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-              params, new RestCallback1<>(Coupon.class, true, listener, "data", "brand", "offer"));
+                params, new RestCallback1<>(Coupon.class, true, listener, "data", "brand", "offer"));
     }
 
     public void getBrandCoupons(Integer brandId, ApiListener1<Coupon> listener) {
@@ -689,58 +755,11 @@ public class RestClient {
     public void getBrandCoupons(Integer brandId, HashMap<String, Object> filter, ApiListener1<Coupon> listener) {
         getBrandCoupons(brandId, DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
-    public void getBrandCoupons(Integer brandId, Integer limit, Integer offset,
-                               HashMap<String, Object> filter, ApiListener1<Coupon> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+    public void getBrandCoupons(Integer brandId, Integer limit, Integer offset, HashMap<String, Object> filter,
+                                ApiListener1<Coupon> listener) {
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getBrandCoupons(sApiVersion, HarpoonSDK.getUserId(), brandId, HarpoonSDK.getUserToken(),
-              params, new RestCallback1<>(Coupon.class, true, listener, "data", "brand", "coupon"));
-    }
-
-    //------Event api methods--------------------------------------------
-
-    public void getEvents(ApiListener1<Event> listener) {
-        getEvents(DEF_LIMIT, DEF_OFFSET, null, listener);
-    }
-    public void getEvents(HashMap<String, Object> filter, ApiListener1<Event> listener) {
-        getEvents(DEF_LIMIT, DEF_OFFSET, filter, listener);
-    }
-    public void getEvents(Integer limit, Integer offset,
-                          HashMap<String, Object> filter, ApiListener1<Event> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
-        getApiService().getEvents(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
-                params, new RestCallback1<>(Event.class, true, listener, "data", "event"));
-    }
-
-    public void getEventInfo(String eventId, ApiListener1<Event> listener) {
-        getApiService().getEventInfo(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
-                new RestCallback1<>(Event.class, listener, "data", "event"));
-    }
-
-    public void getEventAttendees(String eventId, ApiListener1<EventAttendee> listener) {
-        getEventAttendees(eventId, DEF_LIMIT, DEF_OFFSET, listener);
-    }
-    public void getEventAttendees(String eventId, Integer limit, Integer offset,
-                                  ApiListener1<EventAttendee> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
-        getApiService().getEventAttendees(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
-                params, new RestCallback1<>(EventAttendee.class, true, listener, "data", "event", "attendee"));
-    }
-
-    public void getEventVenues(String eventId, ApiListener1<Venue> listener) {
-        getEventVenues(eventId, DEF_LIMIT, DEF_OFFSET, listener);
-    }
-    public void getEventVenues(String eventId, Integer limit, Integer offset,
-                               ApiListener1<Venue> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
-        getApiService().getEventVenues(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
-                params, new RestCallback1<>(Venue.class, true, listener, "data", "event", "venue"));
-    }
-
-    public void checkoutEvent(String[] ids, Integer[] quantities, String eventId,
-                              ApiListener1<Checkout> listener) {
-        HashMap<String, Object> params = Data.checkoutList(ids, quantities);
-        getApiService().checkoutEvent(sApiVersion, HarpoonSDK.getUserId(), eventId, HarpoonSDK.getUserToken(),
-                params, new RestCallback1<>(Checkout.class, listener, "data", "event", "checkout"));
+                params, new RestCallback1<>(Coupon.class, true, listener, "data", "brand", "coupon"));
     }
 
     //------Offer api methods--------------------------------------------
@@ -752,7 +771,7 @@ public class RestClient {
         getOffers(filter, null, null, listener);
     }
     public void getOffers(HashMap<String, Object> filter, Integer limit, Integer offset, ApiListener1<Coupon> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getOffers(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Coupon.class, true, listener, "data", "offer"));
     }
@@ -766,7 +785,7 @@ public class RestClient {
         getCoupons(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getCoupons(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener1<Coupon> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getCoupons(sApiVersion, HarpoonSDK.getUserId(), HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Coupon.class, true, listener, "data", "coupon"));
     }
@@ -780,7 +799,7 @@ public class RestClient {
         getCouponVenues(couponId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getCouponVenues(String couponId, Integer limit, Integer offset, ApiListener1<Venue> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getCouponVenues(sApiVersion, HarpoonSDK.getUserId(), couponId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Venue.class, true, listener, "data", "coupon", "venue"));
     }
@@ -801,7 +820,7 @@ public class RestClient {
         getSimpleDeals(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getSimpleDeals(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener1<SimpleDeal> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getDeals(sApiVersion, HarpoonSDK.getUserId(), "simple", HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(SimpleDeal.class, true, listener, "data", "deal", "simple"));
     }
@@ -815,7 +834,7 @@ public class RestClient {
         getSimpleDealVenues(dealId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getSimpleDealVenues(String dealId, Integer limit, Integer offset, ApiListener1<Venue> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getDealVenues(sApiVersion, HarpoonSDK.getUserId(), "simple", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Venue.class, true, listener, "data", "deal", "simple", "venue"));
     }
@@ -834,7 +853,7 @@ public class RestClient {
         getGroupDeals(DEF_LIMIT, DEF_OFFSET, filter, listener);
     }
     public void getGroupDeals(Integer limit, Integer offset, HashMap<String, Object> filter, ApiListener1<GroupDeal> listener) {
-        HashMap<String, Object> params = Data.listFilterParams(limit, offset, filter);
+        HashMap<String, Object> params = ParamsHelper.listFilterParams(limit, offset, filter);
         getApiService().getDeals(sApiVersion, HarpoonSDK.getUserId(), "group", HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(GroupDeal.class, true, listener, "data", "deal", "group"));
     }
@@ -848,7 +867,7 @@ public class RestClient {
         getGroupDealVenues(dealId, DEF_LIMIT, DEF_OFFSET, listener);
     }
     public void getGroupDealVenues(String dealId, Integer limit, Integer offset, ApiListener1<Venue> listener) {
-        HashMap<String, Object> params = Data.listParams(limit, offset);
+        HashMap<String, Object> params = ParamsHelper.listParams(limit, offset);
         getApiService().getDealVenues(sApiVersion, HarpoonSDK.getUserId(), "group", dealId, HarpoonSDK.getUserToken(),
                 params, new RestCallback1<>(Venue.class, true, listener, "data", "deal", "group", "venue"));
     }

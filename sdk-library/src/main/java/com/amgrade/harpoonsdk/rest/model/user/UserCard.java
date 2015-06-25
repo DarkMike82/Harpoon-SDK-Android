@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * User Card Model<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class UserCard implements Serializable {
     @SerializedName("id")

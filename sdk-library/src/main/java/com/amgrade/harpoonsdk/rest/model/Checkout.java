@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * Checkout Model (for {@link Event}, {@link Coupon}, {@link SimpleDeal} or {@link GroupDeal})<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class Checkout implements Serializable {
     @SerializedName("cart_id")

@@ -28,7 +28,8 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
- * Created by michael on 27.05.15.
+ * Method definitions for authenticated requests (with app token or user token)
+ * Created by Michael Dontsov on 27.05.15.
  */
 interface ApiService {
     //-------------------------------------------------------------------
@@ -75,6 +76,172 @@ interface ApiService {
                                     @Body Serializable params, RestCallback callback);*/
 
     //-------------------------------------------------------------------
+    //User api methods
+    //-------------------------------------------------------------------
+    @POST("/{v}/user/")
+    void createUser(@Path("v") String apiVersion, @Query("token") String appToken,
+                    @Body Serializable userData, RestCallback1<User> callback);
+
+
+    @GET("/{v}/{user.id}/")
+    void getUser(@Path("v") String apiVersion, @Path("user.id") String userId,
+                 @Query("token") String token, RestCallback1<User> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/")
+    void getUserById(@Path("v") String apiVersion, @Path("user.id") String currentUserId, @Path("id") String userId,
+                     @Query("token") String token, RestCallback1<User> callback);
+
+    @GET("/{v}/{user.id}/user/")
+    void getUsers(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                  @Body Serializable params, RestCallback1<User> callback);
+
+    @PUT("/{v}/{user.id}/user/")
+    void updateUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                    @Body Serializable userData, RestCallback1<User> callback);
+
+    @POST("/{v}/user/login/{provider}/")
+    void login(@Path("v") String apiVersion, @Path("provider") String provider, @Query("token") String appToken,
+               @Body Serializable params, RestCallback1<User> callback);
+
+    @GET("/{v}/user/password/")
+    void resetPassword(@Path("v") String apiVersion, @Query("token") String token, @Body Serializable params,
+                       RestCallback callback);
+
+    @GET("/{v}/{user.id}/user/password/")
+    void resetPasswordWithAuth(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                               RestCallback callback);
+
+    @PUT("/{v}/{user.id}/user/password/")
+    void updatePassword(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                        @Body Serializable params, RestCallback callback);
+
+    /*@POST("/{v}/{user.id}/user/connection/{provider}/")
+    void addConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
+                       @Query("token") String token, @Body Serializable params, RestCallback callback);
+
+    @PUT("/{v}/{user.id}/user/connection/{provider}/")
+    void updateConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
+                          @Query("token") String token, @Body Serializable params, RestCallback callback);
+
+    @DELETE("/{v}/{user.id}/user/connection/{provider}/")
+    void deleteConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
+                          @Query("token") String token, RestCallback callback);*/
+
+    @GET("/{v}/{user.id}/user/activity/")
+    void getActivities(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                       @Body Serializable params, RestCallback1<UserAction> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/activity/")
+    void getActivitiesByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                               @Query("token") String token, @Body Serializable params, RestCallback1<UserAction> callback);
+
+    @GET("/{v}/{user.id}/user/follower/")
+    void getFollowers(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                      @Body Serializable params, RestCallback1<UserFollower> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/follower/")
+    void getFollowersByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                              @Query("token") String token, @Body Serializable params, RestCallback1<UserFollower> callback);
+
+    @PUT("/{v}/{user.id}/user/{id}/following/")
+    void followUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                    @Query("token") String token, RestCallback1<UserFollowing> callback);
+
+    @DELETE("/{v}/{user.id}/user/{id}/follower/")
+    void unfollowUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                      @Query("token") String token, RestCallback1<UserFollowing> callback);
+
+    @GET("/{v}/{user.id}/user/following/")
+    void getFollowings(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                       @Body Serializable params, RestCallback1<UserFollowing> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/following/")
+    void getFollowingsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                               @Query("token") String token, @Body Serializable params, RestCallback1<UserFollowing> callback);
+
+    //"Notification" method not needed for now
+
+    @GET("/{v}/{user.id}/user/event/attending/")
+    void getAttendingEvents(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                            @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/event/attending/")
+    void getAttendingEventsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                                    @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{user.id}/user/event/attended/")
+    void getAttendedEvents(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                           @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{user.id}/user/{id}/event/attended/")
+    void getAttendedEventsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
+                                   @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{user.id}/user/event/{event.id}/ticket/")
+    void getEventTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("event.id") String id,
+                         @Query("token") String token, @Body Serializable params, RestCallback1<UserEventTicket> callback);
+
+    @GET("/{v}/{user.id}/user/coupon/{coupon.id}/ticket/")
+    void getCouponTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String id,
+                          @Query("token") String token, @Body Serializable params, RestCallback1<UserCouponTicket> callback);
+
+    @GET("/{v}/{user.id}/user/deal/{deal.type}/{deal.id}/ticket/")
+    void getDealTickets(@Path("v") String apiVersion, @Path("user.id") String userId,
+                        @Path("deal.type") String type, @Path("deal.id") String id,
+                        @Query("token") String token, @Body Serializable params, RestCallback1<UserDealTicket> callback);
+
+    @GET("/{v}/{user.id}/user/card/")
+    void getCards(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                  @Body Serializable params, RestCallback1<UserCard> callback);
+
+    @GET("/{v}/{user.id}/user/card/{card.id}/")
+    void getCardInfo(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
+                     @Query("token") String token, RestCallback1<UserCard> callback);
+
+    @PUT("/{v}/{user.id}/user/card/{card.id}/")
+    void updateCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
+                    @Query("token") String token, @Body Serializable params, RestCallback1<UserCard> callback);
+
+    @GET("/{v}/{user.id}/user/card/")
+    void addCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                 @Body Serializable params, RestCallback1<UserCard> callback);
+
+    @DELETE("/{v}/{user.id}/user/card/{card.id}/")
+    void removeCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
+                    @Query("token") String token, RestCallback1<UserCard> callback);
+
+    @GET("/{v}/{user.id}/user/wallet/current/")
+    void getCurrentWallet(@Path("v") String apiVersion, @Path("user.id") String userId,
+                          @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{user.id}/user/wallet/history/")
+    void getWalletHistory(@Path("v") String apiVersion, @Path("user.id") String userId,
+                          @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
+
+    //-------------------------------------------------------------------
+    //Event api methods
+    //-------------------------------------------------------------------
+    @GET("/{v}/{userId}/event/")
+    void getEvents(@Path("v") String apiVersion, @Path("userId") String user_id,
+                   @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
+
+    @GET("/{v}/{userId}/event/{eventId}/")
+    void getEventInfo(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
+                      @Query("token") String token, RestCallback1<Event> callback);
+
+    @GET("/{v}/{userId}/event/{eventId}/attendee/")
+    void getEventAttendees(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
+                           @Query("token") String token, @Body Serializable params, RestCallback1<EventAttendee> callback);
+
+    @GET("/{v}/{userId}/event/{eventId}/venue")
+    void getEventVenues(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
+                        @Query("token") String token, @Body Serializable params, RestCallback1<Venue> callback);
+
+    @POST("/{v}/{userId}/event/{eventId}/checkout")
+    void eventCheckout(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
+                       @Query("token") String token, @Body Serializable params, RestCallback1<Checkout> callback);
+
+    //-------------------------------------------------------------------
     //Brand api methods
     //-------------------------------------------------------------------
     @GET("/{v}/{userId}/brand/")
@@ -118,176 +285,11 @@ interface ApiService {
                         @Query("token") String token, @Body Serializable params, RestCallback1<Coupon> callback);
 
     //-------------------------------------------------------------------
-    //Event api methods
-    //-------------------------------------------------------------------
-    @GET("/{v}/{userId}/event/")
-    void getEvents(@Path("v") String apiVersion, @Path("userId") String user_id,
-                   @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{userId}/event/{eventId}/")
-    void getEventInfo(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
-                      @Query("token") String token, RestCallback1<Event> callback);
-
-    @GET("/{v}/{userId}/event/{eventId}/attendee/")
-    void getEventAttendees(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
-                           @Query("token") String token, @Body Serializable params, RestCallback1<EventAttendee> callback);
-
-    @GET("/{v}/{userId}/event/{eventId}/venue")
-    void getEventVenues(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
-                        @Query("token") String token, @Body Serializable params, RestCallback1<Venue> callback);
-
-    @POST("/{v}/{userId}/event/{eventId}/checkout")
-    void checkoutEvent(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
-                       @Query("token") String token, @Body Serializable params, RestCallback1<Checkout> callback);
-
-    //-------------------------------------------------------------------
     //Offer api methods
     //-------------------------------------------------------------------
     @GET("/{v}/{userId}/offer/")
     void getOffers(@Path("v") String apiVersion, @Path("userId") String user_id, @Query("token") String token,
                    @Body Serializable params, RestCallback1<Coupon> callback);
-
-    //-------------------------------------------------------------------
-    //User api methods
-    //-------------------------------------------------------------------
-    @POST("/{v}/user/")
-    void createUser(@Path("v") String apiVersion, @Query("app.token") String token,
-                    @Body Serializable userData, RestCallback1<User> callback);
-
-
-    @GET("/{v}/{user.id}/")
-    void getUser(@Path("v") String apiVersion, @Path("user.id") String userId,
-                 @Query("token") String token, RestCallback1<User> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/")
-    void getUserById(@Path("v") String apiVersion, @Path("user.id") String currentUserId, @Path("id") String userId,
-                     @Query("token") String token, RestCallback1<User> callback);
-
-    @GET("/{v}/{user.id}/user/")
-    void getUsers(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                  @Body Serializable params, RestCallback1<User> callback);
-
-    @PUT("/{v}/{user.id}/user/")
-    void updateUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                    @Body Serializable userData, RestCallback1<User> callback);
-
-    @POST("/{v}/user/login/{provider}/")
-    void login(@Path("v") String apiVersion, @Path("provider") String provider, @Query("app.token") String token,
-               @Body Serializable params, RestCallback1<User> callback);
-
-    @GET("/{v}/user/password/")
-    void resetPassword(@Path("v") String apiVersion, @Body Serializable params, RestCallback callback);
-
-    @GET("/{v}/{user.id}/user/password/")
-    void resetPasswordWithAuth(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                               RestCallback callback);
-
-    @PUT("/{v}/{user.id}/user/password/")
-    void updatePassword(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                        @Body Serializable params, RestCallback callback);
-
-    /*@POST("/{v}/{user.id}/user/connection/{provider}/")
-    void addConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
-                       @Query("token") String token, @Body Serializable params, RestCallback callback);
-
-    @PUT("/{v}/{user.id}/user/connection/{provider}/")
-    void updateConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
-                          @Query("token") String token, @Body Serializable params, RestCallback callback);
-
-    @DELETE("/{v}/{user.id}/user/connection/{provider}/")
-    void deleteConnection(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("provider") String provider,
-                          @Query("token") String token, RestCallback callback);*/
-
-    @GET("/{v}/{user.id}/user/activity/")
-    void getActivities(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                       @Body Serializable params, RestCallback1<UserAction> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/activity/")
-    void getActivitiesByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                       @Query("token") String token, @Body Serializable params, RestCallback1<UserAction> callback);
-
-    @GET("/{v}/{user.id}/user/follower/")
-    void getFollowers(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                      @Body Serializable params, RestCallback1<UserFollower> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/follower/")
-    void getFollowersByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                      @Query("token") String token, @Body Serializable params, RestCallback1<UserFollower> callback);
-
-    @PUT("/{v}/{user.id}/user/{id}/following/")
-    void followUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                    @Query("token") String token, RestCallback1<UserFollowing> callback);
-
-    @DELETE("/{v}/{user.id}/user/{id}/follower/")
-    void unfollowUser(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                    @Query("token") String token, RestCallback1<UserFollowing> callback);
-
-    @GET("/{v}/{user.id}/user/following/")
-    void getFollowings(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                      @Body Serializable params, RestCallback1<UserFollowing> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/following/")
-    void getFollowingsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                              @Query("token") String token, @Body Serializable params, RestCallback1<UserFollowing> callback);
-
-    //"Notification" method not needed for now
-
-    @GET("/{v}/{user.id}/user/event/attending/")
-    void getAttendingEvents(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                            @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/event/attending/")
-    void getAttendingEventsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                                    @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{user.id}/user/event/attended/")
-    void getAttendedEvents(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                            @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{user.id}/user/{id}/event/attended/")
-    void getAttendedEventsByUserId(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("id") String id,
-                                    @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{user.id}/user/event/{event.id}/ticket/")
-    void getEventTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("event.id") String id,
-                         @Query("token") String token, @Body Serializable params, RestCallback1<UserEventTicket> callback);
-
-    @GET("/{v}/{user.id}/user/coupon/{coupon.id}/ticket/")
-    void getCouponTickets(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String id,
-                         @Query("token") String token, @Body Serializable params, RestCallback1<UserCouponTicket> callback);
-
-    @GET("/{v}/{user.id}/user/deal/{deal.type}/{deal.id}/ticket/")
-    void getDealTickets(@Path("v") String apiVersion, @Path("user.id") String userId,
-                        @Path("deal.type") String type, @Path("deal.id") String id,
-                        @Query("token") String token, @Body Serializable params, RestCallback1<UserDealTicket> callback);
-
-    @GET("/{v}/{user.id}/user/card/")
-    void getCards(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                  @Body Serializable params, RestCallback1<UserCard> callback);
-
-    @GET("/{v}/{user.id}/user/card/{card.id}/")
-    void getCardInfo(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
-                     @Query("token") String token, RestCallback1<UserCard> callback);
-
-    @PUT("/{v}/{user.id}/user/card/{card.id}/")
-    void updateCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
-                    @Query("token") String token, @Body Serializable params, RestCallback1<UserCard> callback);
-
-    @GET("/{v}/{user.id}/user/card/")
-    void addCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
-                 @Body Serializable params, RestCallback1<UserCard> callback);
-
-    @DELETE("/{v}/{user.id}/user/card/{card.id}/")
-    void removeCard(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("card.id") String cardId,
-                    @Query("token") String token, RestCallback1<UserCard> callback);
-
-    @GET("/{v}/{user.id}/user/wallet/current/")
-    void getCurrentWallet(@Path("v") String apiVersion, @Path("user.id") String userId,
-                          @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
-
-    @GET("/{v}/{user.id}/user/wallet/history/")
-    void getWalletHistory(@Path("v") String apiVersion, @Path("user.id") String userId,
-                          @Query("token") String token, @Body Serializable params, RestCallback1<Event> callback);
 
     //-------------------------------------------------------------------
     //Coupon api methods

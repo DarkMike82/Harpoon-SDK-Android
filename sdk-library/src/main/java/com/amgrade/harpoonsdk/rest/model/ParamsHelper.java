@@ -1,16 +1,26 @@
 package com.amgrade.harpoonsdk.rest.model;
 
+import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.rest.RestClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * API params interface for application
- * Created by michael on 04.06.15.
+ * Helper to create params for API requests<br/>
+ * Can store information about current user. If you want to register a new user, put its data here using:<br/>
+ * {@link #setUser(String, String, String, String, String, String)},<br/>
+ * {@link #setCover(String, String)},<br/>
+ * {@link #setProfilePicture(String, String)},<br/>
+ * {@link #addUserMetadata(String[], Object[])},<br/>
+ * {@link #setConnection(String, String)},<br/>
+ * {@link #requestAuthCodeForUser(boolean)},<br/>
+ * {@link #setRandomString(String)}.<br/>
+ * <br/>
+ * Created by Michael Dontsov on 04.06.15.
  */
-public class Data {
-    private static UserData sUser;
+public class ParamsHelper {
+    private static UserParams sUser;
 
     //-------------------------------------------------------------------
     //list & filter-data methods
@@ -84,6 +94,9 @@ public class Data {
     }
 
     public static HashMap getUser() {
+        if (!sUser.containsKey("client_id")) {
+            sUser.put("client_id", HarpoonSDK.getAppId());
+        }
         return sUser;
     }
 
@@ -100,7 +113,7 @@ public class Data {
                                    String f_name, String l_name,
                                    String birthday, String gender) {
         if (sUser==null) {
-            sUser = new UserData(email, pwd, f_name, l_name, birthday, gender);
+            sUser = new UserParams(email, pwd, f_name, l_name, birthday, gender);
         } else {
             sUser.setData(email, pwd, f_name, l_name, birthday, gender);
         }
@@ -129,6 +142,14 @@ public class Data {
     /*public static void setUserLocation(String lat, String lon) {
         sUser.setLocation(lat, lon);
     }*/
+
+    public void requestAuthCodeForUser(boolean needAuthCode) {
+        sUser.requestAuthCodeForUser(needAuthCode);
+    }
+
+    public void setRandomString(String text) {
+        sUser.setRandomString(text);
+    }
 
     public static void clearUser() {
         sUser.clear();

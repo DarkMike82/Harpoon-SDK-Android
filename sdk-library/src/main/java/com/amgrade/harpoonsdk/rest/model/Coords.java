@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * Location coordinates<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class Coords implements Serializable {
     @SerializedName("latitude")

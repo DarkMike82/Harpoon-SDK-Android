@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import retrofit.mime.TypedInput;
 
 /**
- * Created by michael on 22.06.15.
+ * Created by Michael Dontsov on 22.06.15.
  */
 class JsonTypedInput implements TypedInput {
     private byte[] mBytes;

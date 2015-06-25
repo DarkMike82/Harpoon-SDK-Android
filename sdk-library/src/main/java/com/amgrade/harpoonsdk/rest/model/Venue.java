@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * Venue Model (for {@link Brand}, {@link Coupon} or {@link Event})<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class Venue implements Serializable {
     @SerializedName("id")

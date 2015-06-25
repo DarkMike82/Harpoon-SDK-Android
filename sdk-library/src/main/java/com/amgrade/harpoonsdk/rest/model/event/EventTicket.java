@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * Ticket Model (for {@link Event})<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class EventTicket implements Serializable {
     @SerializedName("id")

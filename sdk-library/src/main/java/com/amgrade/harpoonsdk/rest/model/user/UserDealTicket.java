@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  * User Deal Ticket Model<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class UserDealTicket implements Serializable {
     @SerializedName("id")

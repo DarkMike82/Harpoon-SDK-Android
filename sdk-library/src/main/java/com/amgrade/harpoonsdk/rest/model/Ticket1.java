@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 /**
- * Created by michael on 11.06.15.
+ * Created by Michael Dontsov on 11.06.15.
  * Ticket or Merchandise for event
  */
 class Ticket1 implements Serializable {

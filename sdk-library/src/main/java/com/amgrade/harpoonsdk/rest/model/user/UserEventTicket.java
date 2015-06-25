@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * User Event Ticket Model<br/>
- * Created by michael on 24.06.15.
+ * Created by Michael Dontsov on 24.06.15.
  */
 public class UserEventTicket implements Serializable {
     @SerializedName("id")

@@ -7,7 +7,8 @@ import retrofit.http.POST;
 import retrofit.http.Path;
 
 /**
- * Created by michael on 19.06.15.
+ * Method definition for authentication
+ * Created by Michael Dontsov on 19.06.15.
  */
 public interface AuthService {
     @POST("/{v}/auth/token/")

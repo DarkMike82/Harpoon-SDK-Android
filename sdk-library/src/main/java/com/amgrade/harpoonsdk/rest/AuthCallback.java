@@ -8,7 +8,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by michael on 19.06.15.
+ * Callback for authentication
+ * Created by Michael Dontsov on 19.06.15.
  */
 public class AuthCallback extends RestCallback {
 

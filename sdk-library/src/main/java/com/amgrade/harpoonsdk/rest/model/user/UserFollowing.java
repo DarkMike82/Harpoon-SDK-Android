@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * User Following Model<br/>
- * Created by michael on 23.06.15.
+ * Created by Michael Dontsov on 23.06.15.
  */
 public class UserFollowing implements Serializable {
     @SerializedName("id")

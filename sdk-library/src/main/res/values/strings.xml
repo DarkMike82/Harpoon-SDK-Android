@@ -10,6 +10,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <string name="old_api">You're using Android version lower than 4.4 (KITKAT). Beacon advertising is unavailable on your device.</string>
     <string name="no_context">SDK context is not initialised!</string>
     <string name="error_net">Unexpected network error occurred. Please try again later or check your internet settings.</string>
     <string name="error_conv">Conversion error (wrong response format).</string>

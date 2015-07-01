@@ -1,4 +1,16 @@
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//    }
+//    dependencies {
+//        classpath 'com.android.tools.build:gradle:1.2.3'
+//    }
+//}
+
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+//version = "0.1"
 
 android {
     compileSdkVersion 22
@@ -8,7 +20,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
 
     buildTypes {
@@ -19,6 +31,10 @@ android {
     }
 }
 
+//def siteUrl = 'https://bitbucket.org/inteza/harpoon-sdk-android'      // Homepage URL of the library
+//def gitUrl = 'https://mihail_doncov@bitbucket.org/inteza/harpoon-sdk-android.git'   // Git repository URL
+//group = "com.amgrade.harpoon"
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.1.1'
@@ -27,7 +43,7 @@ dependencies {
 //    compile 'com.squareup.retrofit:converter-simplexml:1.9.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
-    compile 'org.immutables:gson:1.1.3'
+    compile 'org.immutables:gson:2.0.14'
     //material dependencies
     compile 'com.github.rey5137:material:1.1.0'
     compile 'com.afollestad:material-dialogs:0.7.6.0'
@@ -35,4 +51,25 @@ dependencies {
 //    compile ('ch.acra:acra:4.5.0') {
 //        exclude group: 'org.json'
 //    }
+
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+
+    task javadoc(type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+//        options.encoding = 'UTF-8'
+    }
+    artifacts {
+        archives javadocJar
+        archives sourcesJar
+    }
+
 }

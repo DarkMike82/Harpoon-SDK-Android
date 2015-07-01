@@ -73,7 +73,7 @@ class RestCallback implements Callback<JsonObject> {
                     break;
 
             }
-            mListener.onError(null, responseMsg);
+            mListener.onError(/*null,*/ responseMsg);
             return;
         }
         //if response received, but is not valid JSON
@@ -83,12 +83,12 @@ class RestCallback implements Callback<JsonObject> {
         } catch (Exception e) {
             Log.e(ConversionException.class.getName(), e.getLocalizedMessage());
 //            responseMsg = getString(R.string.error_conv);
-            mListener.onError(response.getStatus()+"", response.getReason());
+            mListener.onError(response.getReason()+"\nError code: "+response.getStatus());
             return;
         }
         //if response is valid JSON
         String[] errorInfo = getErrorInfo(body);
-        mListener.onError(errorInfo[0], errorInfo[1]);
+        mListener.onError(errorInfo[1]+"\nError code: "+errorInfo[0]);
     }
 
 //    public void setOnSuccessAction(int action) {
@@ -99,12 +99,13 @@ class RestCallback implements Callback<JsonObject> {
     //internal methods
     //---------------------------------------------------------------------
     protected JsonElement extractData(String[] keys, JsonObject container) {
-        if (keys!=null || keys.length==0) {
+        if (keys==null || keys.length==0) {
             return null;
         }
         JsonElement data = container.get(keys[0]);
         for (int i = 1; i < keys.length; i++) {
             data = data.getAsJsonObject().get(keys[i]);
+//            Log.d("HARPOONSDK", keys[i]+": "+data.toString());
         }
         return data;
     }

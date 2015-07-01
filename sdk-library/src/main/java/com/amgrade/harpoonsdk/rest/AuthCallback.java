@@ -19,11 +19,14 @@ public class AuthCallback extends RestCallback {
 
     @Override
     public void success(JsonObject jsonObject, Response response) {
+//        Log.d("HARPOONSDK", "response: " + jsonObject.toString());
         JsonElement responseData = extractData(mKeys, jsonObject);
         String token = responseData.getAsJsonObject().get("token").getAsString();
         String token_type = responseData.getAsJsonObject().get("type").getAsString();
-        HarpoonSDK.setToken(token_type, token);
-        mListener.onSuccess(jsonObject);
+        Long token_expires = System.currentTimeMillis() +
+                responseData.getAsJsonObject().get("expires_in").getAsLong()*1000;
+        HarpoonSDK.setToken(token_type, token, token_expires);
+        mListener.onSuccess();
     }
 
     @Override

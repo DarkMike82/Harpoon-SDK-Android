@@ -23,11 +23,13 @@ public class HarpoonSDK {
     private static String sAppSecret;
     private static String sAppBundle; //app package name
     private static String sAppToken;
+    private static Long sAppTokenExpires;
 
     //user data
     private static String sUserId;
     private static String sUserAuthCode;
     private static String sUserToken;
+    private static Long sUserTokenExpires;
 
     //brand data
 //    private static int sBrandId;
@@ -105,13 +107,15 @@ public class HarpoonSDK {
      * @param type either {@link #TOKEN_APP} or {@link #TOKEN_USER}.
      * @param token token value.
      */
-    public static void setToken(String type, String token) {
+    public static void setToken(String type, String token, Long token_expires) {
         if (type.contentEquals(TOKEN_APP)) {
             sAppToken = token;
             saveToPrefs("app.token", token);
+            saveToPrefs("app.token.expires", token_expires);
         } else if (type.contentEquals(TOKEN_USER)) {
             sUserToken = token;
             saveToPrefs("user.token", token);
+            saveToPrefs("user.token.expires", token_expires);
         }
     }
 
@@ -131,6 +135,18 @@ public class HarpoonSDK {
         return sAppToken;
     }
 
+    public static boolean isAppTokenExpired() {
+        if (sAppToken==null) {
+            return true;
+        }
+        Long app_token_expires = null;
+        loadPreference("app.token.expires", app_token_expires);
+        if (System.currentTimeMillis()>app_token_expires) {
+            return true;
+        }
+        return false;
+    }
+
     public static String getUserId() {
         return sUserId;
     }
@@ -141,6 +157,18 @@ public class HarpoonSDK {
 
     public static String getUserToken() {
         return sUserToken;
+    }
+
+    public static boolean isUserTokenExpired() {
+        if (sUserToken==null) {
+            return true;
+        }
+        Long user_token_expires = null;
+        loadPreference("user.token.expires", user_token_expires);
+        if (System.currentTimeMillis()>user_token_expires) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -174,6 +202,8 @@ public class HarpoonSDK {
             editor.putString(formattedKey, (String)value);
         } else if (value instanceof Integer) {
             editor.putInt(formattedKey, (Integer)value);
+        } else if (value instanceof Long) {
+            editor.putLong(formattedKey, (Long) value);
         }
         editor.apply();
     }
@@ -184,12 +214,26 @@ public class HarpoonSDK {
             dest = sPrefs.getString(formattedKey,null);
         } else if (dest instanceof Integer) {
             int value = sPrefs.getInt(formattedKey,Integer.MIN_VALUE);
-            if (value==Integer.MIN_VALUE) {
-                dest = null;
-            } else {
+//            if (value==Integer.MIN_VALUE) {
+//                dest = null;
+//            } else {
                 dest = Integer.valueOf(value);
-            }
+//            }
+        } else if (dest instanceof Long) {
+            long value = sPrefs.getLong(formattedKey, Long.MIN_VALUE);
+//            if (value==Long.MIN_VALUE) {
+//                dest = null;
+//            } else {
+                dest = Long.valueOf(value);
+//            }
         }
+    }
+
+    private static void removePreference(String key) {
+        String formattedKey = formatPreferenceKey(key);
+        SharedPreferences.Editor editor = sPrefs.edit();
+        editor.remove(formattedKey);
+        editor.apply();
     }
 
 }

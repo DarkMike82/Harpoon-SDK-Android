@@ -1,5 +1,7 @@
 package com.amgrade.harpoonsdk.rest;
 
+import android.util.Base64;
+
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.rest.model.Checkout;
 import com.amgrade.harpoonsdk.rest.model.Coupon;
@@ -42,6 +44,7 @@ public class RestClient {
     public static final Integer DEF_OFFSET = 0;
 
     private static final String BASE_URL = "https://api.harpoonconnect.com";
+    private static final String BASE_ALPHA_URL = "http://alpha.api.harpoonconnect.com";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     private static String sApiVersion = "v1";
@@ -56,6 +59,7 @@ public class RestClient {
 
     private ApiService mApiService;
     private AuthService mAuthService;
+    private boolean needBasicAuth = true;
 
     /**
      * Singleton to use api client.
@@ -86,16 +90,16 @@ public class RestClient {
         }
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
-                .setEndpoint(BASE_URL)
+                .setEndpoint(BASE_ALPHA_URL)
                 .setConverter(sConverter)
-                .setRequestInterceptor(createInterceptor(false))
+                .setRequestInterceptor(createInterceptor())
                 .build();
         mApiService = restAdapter.create(ApiService.class);
         RestAdapter authAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
-                .setEndpoint(BASE_URL)
+                .setEndpoint(BASE_ALPHA_URL)
                 .setConverter(sConverter)
-                .setRequestInterceptor(createInterceptor(true))
+                .setRequestInterceptor(createAuthInterceptor())
                 .build();
         mAuthService = authAdapter.create(AuthService.class);
     }
@@ -108,7 +112,7 @@ public class RestClient {
         return mAuthService;
     }
 
-    private RequestInterceptor createInterceptor(final boolean forAuth) {
+    private RequestInterceptor createInterceptor() {
         return new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {
@@ -118,10 +122,26 @@ public class RestClient {
 //                request.addHeader("device", null/*?*/); //TODO
 //                request.addHeader("visitor", null/*?*/); //TODO
                 request.addHeader("Accept", sAccept);
-                if (forAuth) {
-                    request.addHeader("Content-Type", sContentType1);
-                } else {
-                    request.addHeader("Content-Type", sContentType);
+                request.addHeader("Content-Type", sContentType);
+            }
+        };
+    }
+
+    private RequestInterceptor createAuthInterceptor() {
+        return new RequestInterceptor() {
+            @Override
+            public void intercept(RequestFacade request) {
+                request.addHeader("appid", HarpoonSDK.getAppId());
+                request.addHeader("appsecret", HarpoonSDK.getAppSecret());
+                request.addHeader("appbundle", HarpoonSDK.getAppBundle());
+//                request.addHeader("device", null/*?*/); //TODO
+//                request.addHeader("visitor", null/*?*/); //TODO
+                request.addHeader("Accept", sAccept);
+                request.addHeader("Content-Type", sContentType1);
+                if (needBasicAuth) {
+                    String credentials = HarpoonSDK.getAppId() + ":" + HarpoonSDK.getAppSecret();
+                    String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                    request.addHeader("Authorization", auth);
                 }
             }
         };
@@ -137,16 +157,17 @@ public class RestClient {
 
     /**
      * Authenticate application or user, and receive token for further requests.<br/>
-     * Token will be returned as {@link JsonObject} containing token value,<br/>
-     * type and amount of seconds before the token expires ("token", "type", "expires_in" fields).<br/>
-     * Token is automatically stored in SDK, no need to do it yourself.
-     * @param listener listener for result. {@link ApiListener#onSuccess(JsonObject)} is called on successful response.
+     * For app token request, basic auth will be added (look at {@link #createAuthInterceptor()}).<br/>
+     * Token (and its expiration time) will be saved in preferences and will be accessible through {@link HarpoonSDK}.<br/>
+     * @param listener listener for result. {@link ApiListener#onSuccess()} is called on successful response.
      * @param forUser {@code true} if you want to get access token for user, {@code false} otherwise.
      */
     public void getAuthToken(ApiListener listener, boolean forUser) {
         HashMap<String, String> params = new HashMap<>();
+        needBasicAuth = !forUser;
         if (forUser) {
             params.put("code", HarpoonSDK.getUserAuthCode());
+            params.put("grant_type", "authorization_code");
         }
         getAuthService().getToken(sApiVersion, params, new AuthCallback(listener));
     }

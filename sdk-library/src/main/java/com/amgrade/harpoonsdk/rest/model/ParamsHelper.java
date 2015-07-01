@@ -61,9 +61,9 @@ public class ParamsHelper {
 
     public static HashMap<String, Object> checkoutList(String[] ids, Integer[] quantities) {
         HashMap<String, Object> res = new HashMap<>();
-        ArrayList<Ticket1> list = new ArrayList<>();
+        ArrayList<Ticket> list = new ArrayList<>();
         for (int i=0;i<ids.length;i++) {
-            Ticket1 item = new Ticket1(ids[i], quantities[i]);
+            Ticket item = new Ticket(ids[i], quantities[i]);
             list.add(item);
         }
         res.put("ticket", list);
@@ -82,6 +82,9 @@ public class ParamsHelper {
 //        } else {
             params.put("email", data[0]);
             params.put("password", data[1]);
+//            params.put("client_id", HarpoonSDK.getAppId());
+            params.put("response_type", "code");
+            params.put("random", System.currentTimeMillis()+"");
 //        }
         return params;
     }

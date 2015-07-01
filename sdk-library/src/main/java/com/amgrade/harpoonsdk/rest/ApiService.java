@@ -333,4 +333,12 @@ interface ApiService {
                         @Query("token") String token, @Body Serializable params, RestCallback1<Checkout> callback);
 
 
+    //-------------------------------------------------------------------
+    //Location api methods
+    //-------------------------------------------------------------------
+    @PUT("/{v}/{user.id}/")
+    void refreshCurrentLocation(@Path("v") String apiVersion, @Path("user.id") String userId, @Query("token") String token,
+                                @Body Serializable params, RestCallback1<Venue> callback);
+
+
 }

@@ -5,19 +5,19 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 /**
+ * Ticket or Merchandise for event<br/>
  * Created by Michael Dontsov on 11.06.15.
- * Ticket or Merchandise for event
  */
-class Ticket1 implements Serializable {
+class Ticket implements Serializable {
     @SerializedName("id")
     private String mId;
     @SerializedName("qty")
     private Integer mQuantity;
 
-    public Ticket1() {
+    public Ticket() {
     }
 
-    public Ticket1(String id, Integer quantity) {
+    public Ticket(String id, Integer quantity) {
         mId = id;
         mQuantity = quantity;
     }

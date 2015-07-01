@@ -13,5 +13,5 @@ public interface ApiListener1<T extends Serializable> {
 //    void onSuccess();
     void onSuccess(T response);
     void onSuccess(ArrayList<T> response);
-    void onError(String code, String message);
+    void onError(/*String code,*/ String message);
 }

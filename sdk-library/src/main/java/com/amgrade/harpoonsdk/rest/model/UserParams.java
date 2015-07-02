@@ -15,7 +15,7 @@ class UserParams extends HashMap<String, Object> {
         super();
     }
 
-    public UserParams(String... data) {
+    /*public UserParams(String... data) {
         super();
         this.put("email", data[0]);
         this.put("password", data[1]);
@@ -23,18 +23,39 @@ class UserParams extends HashMap<String, Object> {
         this.put("last_name", data[3]);
         this.put("birthday", data[4]);
         this.put("gender", data[5]);
-    }
+    }*/
 
     /**
      * Reset user's basic data
-     * @param data
+//     * @param data
      */
-    public void setData(String... data) {
+    /*public void setData(String... data) {
         this.put("password", data[1]);
         this.put("first_name", data[2]);
         this.put("last_name", data[3]);
         this.put("birthday", data[4]);
         this.put("gender", data[5]);
+    }*/
+
+    public void setName(String first_name, String last_name) {
+        this.put("first_name", first_name);
+        this.put("last_name", last_name);
+    }
+
+    public void setBirthday(String date) {
+        this.put("dob", date);
+    }
+
+    public void setEmail(String email) {
+        this.put("email", email);
+    }
+
+    public void setGender(String gender) {
+        this.put("gender", gender);
+    }
+
+    public void setPassword(String pwd) {
+        this.put("password", pwd);
     }
 
     public void setPicture(String mime, String base64encodedimage) {
@@ -88,9 +109,9 @@ class UserParams extends HashMap<String, Object> {
 
     public void setRandomString(String text) {
         if (text!=null) {
-            this.put("random", text);
+            this.put("state", text);
         } else {
-            this.remove("random");
+            this.remove("state");
         }
     }
 

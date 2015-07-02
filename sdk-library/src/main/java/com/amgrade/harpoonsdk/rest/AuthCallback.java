@@ -1,5 +1,7 @@
 package com.amgrade.harpoonsdk.rest;
 
+import android.util.Log;
+
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,7 +21,7 @@ public class AuthCallback extends RestCallback {
 
     @Override
     public void success(JsonObject jsonObject, Response response) {
-//        Log.d("HARPOONSDK", "response: " + jsonObject.toString());
+        Log.d("HARPOONSDK", "response: " + jsonObject.toString());
         JsonElement responseData = extractData(mKeys, jsonObject);
         String token = responseData.getAsJsonObject().get("token").getAsString();
         String token_type = responseData.getAsJsonObject().get("type").getAsString();

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -64,11 +63,12 @@ public class HarpoonSDK {
         sAppBundle = appBundle;
 
         //get SharedPreferences and load previously stored values (if any)
-        sPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
-        loadPreference("app.token", sAppToken);
-        loadPreference("user.id", sUserId);
-        loadPreference("user.code",sUserAuthCode);
-        loadPreference("user.token",sUserToken);
+        sPrefs = sContext.getSharedPreferences(sContext.getPackageName()+"_harpoon", Context.MODE_PRIVATE); //PreferenceManager.getDefaultSharedPreferences(sContext);
+        Log.d("HARPOONSDK", "connected prefs"+": "+sContext.getPackageName()+"_harpoon");
+        sAppToken = loadStringPref("app.token");
+        sUserId = loadStringPref("user.id");
+        sUserAuthCode = loadStringPref("user.code");
+        sUserToken = loadStringPref("user.token");
     }
 
     /*public static void setApiVersion(String version) {
@@ -96,10 +96,15 @@ public class HarpoonSDK {
     }
 
     /**
-     * Remove unneeded auth_code (e.g. when token is received)
+     * Remove user data on logout;
      */
-    public static void clearAuthCode() {
+    public static void clearUser() {
+        sUserId = null;
+        removePreference("user.id");
+        sUserToken = null;
+        removePreference("user.token");
         sUserAuthCode = null;
+        removePreference("user.code");
     }
 
     /**
@@ -116,6 +121,9 @@ public class HarpoonSDK {
             sUserToken = token;
             saveToPrefs("user.token", token);
             saveToPrefs("user.token.expires", token_expires);
+            //clear unneeded auth code
+            sUserAuthCode = null;
+            removePreference("user.code");
         }
     }
 
@@ -139,8 +147,7 @@ public class HarpoonSDK {
         if (sAppToken==null) {
             return true;
         }
-        Long app_token_expires = null;
-        loadPreference("app.token.expires", app_token_expires);
+        Long app_token_expires = loadLongPref("app.token.expires");
         if (System.currentTimeMillis()>app_token_expires) {
             return true;
         }
@@ -163,8 +170,7 @@ public class HarpoonSDK {
         if (sUserToken==null) {
             return true;
         }
-        Long user_token_expires = null;
-        loadPreference("user.token.expires", user_token_expires);
+        Long user_token_expires = loadLongPref("user.token.expires");
         if (System.currentTimeMillis()>user_token_expires) {
             return true;
         }
@@ -192,7 +198,7 @@ public class HarpoonSDK {
     }
 
     private static String formatPreferenceKey(String key) {
-        return String.format("%s:%s:%s", DOMAIN, getAppBundle(), key);
+        return String.format("%s:%s:%s", DOMAIN, sContext.getPackageName(), key);
     }
 
     private static void saveToPrefs(String key, Object value) {
@@ -205,19 +211,43 @@ public class HarpoonSDK {
         } else if (value instanceof Long) {
             editor.putLong(formattedKey, (Long) value);
         }
-        editor.apply();
+        boolean saved = editor.commit();//apply();
+        Log.d("HARPOONSDK", "saved "+formattedKey+": "+saved+", "+value);
     }
 
-    private static void loadPreference(String key, Object dest) {
+    private static String loadStringPref(String key) {
         String formattedKey = formatPreferenceKey(key);
-        if (dest instanceof String) {
+        String s = sPrefs.getString(formattedKey, null);
+        Log.d("HARPOONSDK", "loaded "+formattedKey+": "+s);
+        return s;
+    }
+
+    private static int loadIntPref(String key) {
+        String formattedKey = formatPreferenceKey(key);
+        int i = sPrefs.getInt(formattedKey, Integer.MIN_VALUE);
+        Log.d("HARPOONSDK", "loaded "+formattedKey+": "+i);
+        return i;
+    }
+
+    private static long loadLongPref(String key) {
+        String formattedKey = formatPreferenceKey(key);
+        long l = sPrefs.getLong(formattedKey, Long.MIN_VALUE);
+        Log.d("HARPOONSDK", "loaded "+formattedKey+": "+l);
+        return l;
+    }
+
+    /*private static void loadPreference(String key, Class<?> cl) {
+        String formattedKey = formatPreferenceKey(key);
+        if (cl instanceof Class<String>) {
             dest = sPrefs.getString(formattedKey,null);
+            Log.d("HARPOONSDK", "loaded "+formattedKey+": "+dest);
         } else if (dest instanceof Integer) {
             int value = sPrefs.getInt(formattedKey,Integer.MIN_VALUE);
 //            if (value==Integer.MIN_VALUE) {
 //                dest = null;
 //            } else {
                 dest = Integer.valueOf(value);
+                Log.d("HARPOONSDK", "loaded "+formattedKey+": "+dest);
 //            }
         } else if (dest instanceof Long) {
             long value = sPrefs.getLong(formattedKey, Long.MIN_VALUE);
@@ -225,15 +255,17 @@ public class HarpoonSDK {
 //                dest = null;
 //            } else {
                 dest = Long.valueOf(value);
+                Log.d("HARPOONSDK", "loaded "+formattedKey+": "+dest);
 //            }
         }
-    }
+    }*/
 
     private static void removePreference(String key) {
         String formattedKey = formatPreferenceKey(key);
         SharedPreferences.Editor editor = sPrefs.edit();
         editor.remove(formattedKey);
-        editor.apply();
+        boolean saved = editor.commit();//apply();
+        Log.d("HARPOONSDK", "removed " + formattedKey + ": " + saved);
     }
 
 }

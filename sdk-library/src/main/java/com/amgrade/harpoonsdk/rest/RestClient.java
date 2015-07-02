@@ -45,7 +45,7 @@ public class RestClient {
 
     private static final String BASE_URL = "https://api.harpoonconnect.com";
     private static final String BASE_ALPHA_URL = "http://alpha.api.harpoonconnect.com";
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final String DATE_FORMAT = "yyyy/MM/dd";
 
     private static String sApiVersion = "v1";
     private static String sAccept = "application/json";
@@ -59,7 +59,6 @@ public class RestClient {
 
     private ApiService mApiService;
     private AuthService mAuthService;
-    private boolean needBasicAuth = true;
 
     /**
      * Singleton to use api client.
@@ -138,11 +137,9 @@ public class RestClient {
 //                request.addHeader("visitor", null/*?*/); //TODO
                 request.addHeader("Accept", sAccept);
                 request.addHeader("Content-Type", sContentType1);
-                if (needBasicAuth) {
-                    String credentials = HarpoonSDK.getAppId() + ":" + HarpoonSDK.getAppSecret();
-                    String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                    request.addHeader("Authorization", auth);
-                }
+                String credentials = HarpoonSDK.getAppId() + ":" + HarpoonSDK.getAppSecret();
+                String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                request.addHeader("Authorization", auth);
             }
         };
     }
@@ -163,13 +160,13 @@ public class RestClient {
      * @param forUser {@code true} if you want to get access token for user, {@code false} otherwise.
      */
     public void getAuthToken(ApiListener listener, boolean forUser) {
-        HashMap<String, String> params = new HashMap<>();
-        needBasicAuth = !forUser;
         if (forUser) {
-            params.put("code", HarpoonSDK.getUserAuthCode());
-            params.put("grant_type", "authorization_code");
+            String code = HarpoonSDK.getUserAuthCode();
+            String type = "authorization_code";
+            getAuthService().getToken(sApiVersion, code, type, new AuthCallback(listener));
+        } else {
+            getAuthService().getToken(sApiVersion, new AuthCallback(listener));
         }
-        getAuthService().getToken(sApiVersion, params, new AuthCallback(listener));
     }
 
     //------Application api methods--------------------------------------

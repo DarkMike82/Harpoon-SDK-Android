@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.R;
+import com.amgrade.harpoonsdk.rest.model.Coupon;
+import com.amgrade.harpoonsdk.rest.model.deal.GroupDeal;
+import com.amgrade.harpoonsdk.rest.model.deal.SimpleDeal;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,6 +32,7 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
     protected ApiListener1<T> mListener;
     protected String[] mKeys;
     private Class mDataClass;
+    private String mBaseTypeName;
     private int mSuccessAction = -1;
     private boolean isArrayResponse = false;
 
@@ -43,6 +47,10 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
         isArrayResponse = receiveArray;
     }
 
+    public void setTypecast(String typeName) {
+        mBaseTypeName = typeName;
+    }
+
     @Override
     public void success(JsonObject jsonObject, Response response) {
         //since 09.06.2015 API settings changed, so only "success" responses will be processed here
@@ -51,20 +59,57 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
 //        if (responseData==null) {
 //            mListener.onSuccess();
 //        } else {
-            if (isArrayResponse) {
-                JsonArray array = responseData.getAsJsonArray();
+        if (isArrayResponse) {
+            JsonArray array = responseData.getAsJsonArray();
+            if (mBaseTypeName == null) {
                 ArrayList<T> parsedArray = new ArrayList<>();
                 for (int i=0;i<array.size();i++) {
-                    T item = parseJson(new JsonTypedInput(array.get(i)));
-                    if (item!=null) {
-                        parsedArray.add(item);
-                    }
+                        T item = parseJson(new JsonTypedInput(array.get(i)));
+                        if (item != null) {
+                            parsedArray.add(item);
+                        }
                 }
                 mListener.onSuccess(parsedArray);
-            } else {
+            //if mBaseTypeName set, use parsing with subclasses of base class
+            } else if ("Coupon".contentEquals(mBaseTypeName)) {
+                ArrayList<Coupon> parsedArray1 = new ArrayList<>();//list items can be Coupon, SimpleDeal or GroupDeal
+                for (int i=0;i<array.size();i++) {
+                    JsonObject raw_item = array.get(i).getAsJsonObject();
+                    String type = raw_item.get("alias").getAsString();
+                    Coupon item = null;
+                    try {
+                        item = parseOffer(new JsonTypedInput(array.get(i)), type);
+                        if (item != null) {
+                            parsedArray1.add(item);
+                        }
+                    } catch (ConversionException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mListener.onSuccess((ArrayList<T>)parsedArray1);
+            }
+        } else {
+            if (mBaseTypeName == null) {
                 T parsedObject = parseJson(new JsonTypedInput(responseData));
                 mListener.onSuccess(parsedObject);
+            //if mBaseTypeName set, use parsing with subclasses of base class
+            } else if ("Coupon".contentEquals(mBaseTypeName)) {
+                String type = responseData.getAsJsonObject().get("alias").getAsString();
+                Coupon parsedObject1 = null;
+                try {
+                    parsedObject1 = parseOffer(new JsonTypedInput(responseData), type);
+                } catch (ConversionException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (parsedObject1!=null) {
+                    mListener.onSuccess((T)parsedObject1);
+                }
             }
+        }
 //        }
     }
 
@@ -151,13 +196,38 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
         return HarpoonSDK.getContext().getString(resId);
     }
 
+
     private T parseJson(JsonTypedInput input) {
+        return parseJson(input, mDataClass);
+    }
+    private T parseJson(JsonTypedInput input, Class dataClass) {
         T parsedObject = null;
         try {
-            parsedObject = (T) RestClient.getConverter().fromBody(input, mDataClass);
+            parsedObject = (T) RestClient.getConverter().fromBody(input, dataClass);
         } catch (ConversionException e) {
             Log.e("Response conversion", e.getLocalizedMessage());
         }
         return parsedObject;
     }
+
+    private Coupon parseOffer(JsonTypedInput input, String typeName) throws ConversionException, ClassNotFoundException {
+        Class c;
+        Coupon offer;
+        if ("coupon".contentEquals(typeName)) {
+            c = Class.forName("com.amgrade.harpoonsdk.rest.model.Coupon");
+            offer = (Coupon)RestClient.getConverter().fromBody(input, c);
+            return offer;
+        } else if("deal.simple".contentEquals(typeName)) {
+            c = Class.forName("com.amgrade.harpoonsdk.rest.model.deal.SimpleDeal");
+            offer = (SimpleDeal)RestClient.getConverter().fromBody(input, c);
+            return offer;
+        } else if("deal.group".contentEquals(typeName)) {
+            c = Class.forName("com.amgrade.harpoonsdk.rest.model.deal.GroupDeal");
+            offer = (GroupDeal)RestClient.getConverter().fromBody(input, c);
+            return offer;
+        } else {
+            return null;
+        }
+    }
+
 }

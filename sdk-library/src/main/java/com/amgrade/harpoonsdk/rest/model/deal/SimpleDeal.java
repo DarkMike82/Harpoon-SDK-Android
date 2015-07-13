@@ -1,168 +1,163 @@
 package com.amgrade.harpoonsdk.rest.model.deal;
 
-import com.amgrade.harpoonsdk.rest.model.Venue;
-import com.amgrade.harpoonsdk.rest.model.brand.Brand;
+import com.amgrade.harpoonsdk.rest.model.Coupon;
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Simple Deal Model<br/>
  * Created by Michael Dontsov on 24.06.15.
  */
-public class SimpleDeal implements Serializable {
-    @SerializedName("id")
-    private String mId;
+public class SimpleDeal extends Coupon {
+//    @SerializedName("id")
+//    private String mId;
 
-    @SerializedName("product")
-    private DealProduct mProduct;
+//    @SerializedName("product")
+//    private DealProduct mProduct;
 
-    @SerializedName("name")
-    private String mName;
+//    @SerializedName("name")
+//    private String mName;
 
-    @SerializedName("description")
-    private String mDescription;
+//    @SerializedName("description")
+//    private String mDescription;
 
-    @SerializedName("cover")
-    private String mCover;
+//    @SerializedName("cover")
+//    private String mCover;
 
-    @SerializedName("category")
-    private String mCategory;
+//    @SerializedName("category")
+//    private String mCategory;
 
-    @SerializedName("type")
-    private String mType;
+//    @SerializedName("type")
+//    private String mType;
 
-    @SerializedName("alias")
-    private String mAlias;
+//    @SerializedName("alias")
+//    private String mAlias;
 
-    @SerializedName("from")
-    private String mFromDate;
+//    @SerializedName("from")
+//    private String mFromDate;
 
-    @SerializedName("to")
-    private String mToDate;
+//    @SerializedName("to")
+//    private String mToDate;
 
-    @SerializedName("price")
-    private Float mPrice;
+//    @SerializedName("price")
+//    private Float mPrice;
 
-    @SerializedName("qty_left")
-    private Integer mQuantityLeft;
+//    @SerializedName("qty_left")
+//    private Integer mQuantityLeft;
 
-    @SerializedName("qty_total")
-    private Integer mQuantityTotal;
+//    @SerializedName("qty_total")
+//    private Integer mQuantityTotal;
 
     @SerializedName("qty_purchased")
     private Integer mQuantityPurchased;
 
-    @SerializedName("nearest_venue")
-    private Venue mNearestLocation;
+//    @SerializedName("nearest_venue")
+//    private Venue mNearestLocation;
 
     @SerializedName("has_purchased")
     private Boolean mHasPurchased;
 
-    @SerializedName("status")
-    private String mStatus;
+//    @SerializedName("status")
+//    private String mStatus;
 
-    @SerializedName("brand")
-    private Brand mBrand;
+//    @SerializedName("brand")
+//    private Brand mBrand;
 
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+//    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
 
 
     public SimpleDeal() {
+        super();
     }
 
-    public String getId() {
-        return mId;
-    }
+//    public String getId() {
+//        return mId;
+//    }
 
-    public DealProduct getProduct() {
-        return mProduct;
-    }
+//    public DealProduct getProduct() {
+//        return mProduct;
+//    }
 
-    public String getName() {
-        return mName;
-    }
+//    public String getName() {
+//        return mName;
+//    }
 
-    public String getDescription() {
-        return mDescription;
-    }
+//    public String getDescription() {
+//        return mDescription;
+//    }
 
-    public String getCover() {
-        return mCover;
-    }
+//    public String getCover() {
+//        return mCover;
+//    }
 
-    public String getCategory() {
-        return mCategory;
-    }
+//    public String getCategory() {
+//        return mCategory;
+//    }
 
-    public String getType() {
-        return mType;
-    }
+//    public String getType() {
+//        return mType;
+//    }
 
-    public String getAlias() {
-        return mAlias;
-    }
+//    public String getAlias() {
+//        return mAlias;
+//    }
 
-    public Date getFromDate() {
-        if (mFromDate==null) {
-            return null;
-        } else {
-            Date d = null;
-            try {
-                d = mDateFormat.parse(mFromDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return d;
-        }
-    }
+//    public Date getFromDate() {
+//        if (mFromDate==null) {
+//            return null;
+//        } else {
+//            Date d = null;
+//            try {
+//                d = mDateFormat.parse(mFromDate);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            return d;
+//        }
+//    }
 
-    public Date getToDate() {
-        if (mToDate==null) {
-            return null;
-        } else {
-            Date d = null;
-            try {
-                d = mDateFormat.parse(mToDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return d;
-        }
-    }
+//    public Date getToDate() {
+//        if (mToDate==null) {
+//            return null;
+//        } else {
+//            Date d = null;
+//            try {
+//                d = mDateFormat.parse(mToDate);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            return d;
+//        }
+//    }
 
-    public Float getPrice() {
-        return mPrice;
-    }
+//    public Float getPrice() {
+//        return mPrice;
+//    }
 
-    public Integer getQuantityLeft() {
-        return mQuantityLeft;
-    }
+//    public Integer getQuantityLeft() {
+//        return mQuantityLeft;
+//    }
 
-    public Integer getQuantityTotal() {
-        return mQuantityTotal;
-    }
+//    public Integer getQuantityTotal() {
+//        return mQuantityTotal;
+//    }
 
     public Integer getQuantityPurchased() {
         return mQuantityPurchased;
     }
 
-    public Venue getNearestLocation() {
-        return mNearestLocation;
-    }
+//    public Venue getNearestLocation() {
+//        return mNearestLocation;
+//    }
 
     public Boolean hasPurchased() {
         return mHasPurchased;
     }
 
-    public String getStatus() {
-        return mStatus;
-    }
+//    public String getStatus() {
+//        return mStatus;
+//    }
 
-    public Brand getBrand() {
-        return mBrand;
-    }
+//    public Brand getBrand() {
+//        return mBrand;
+//    }
 }

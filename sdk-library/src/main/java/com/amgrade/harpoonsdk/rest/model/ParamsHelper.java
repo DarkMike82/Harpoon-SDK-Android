@@ -26,6 +26,7 @@ import java.util.HashMap;
  */
 public class ParamsHelper {
     private static UserParams sUser = new UserParams();
+    private static boolean isSocial = false;
 
     //-------------------------------------------------------------------
     //list & filter-data methods
@@ -106,7 +107,7 @@ public class ParamsHelper {
             sUser.put("client_id", HarpoonSDK.getAppId());
         }
         sUser.put("response_type", "code");
-        sUser.setRandomString(System.currentTimeMillis()+"");
+        sUser.setRandomString(System.currentTimeMillis() + "");
         return sUser;
     }
 
@@ -146,12 +147,19 @@ public class ParamsHelper {
         sUser.setConnection(connection_name, userId);
     }
 
-    public void requestAuthCodeForUser(boolean needAuthCode) {
+    public static void requestAuthCodeForUser(boolean needAuthCode) {
         sUser.requestAuthCodeForUser(needAuthCode);
     }
 
-    public void setRandomString(String text) {
+    public static void setRandomString(String text) {
         sUser.setRandomString(text);
+    }
+
+    public static boolean isSocial() {
+        return isSocial;
+    }
+    public static void setSocial(boolean social) {
+        isSocial = social;
     }
 
     public static void clearUser() {

@@ -144,6 +144,7 @@ public class ParamsHelper {
     }
 
     public static void setConnection(String connection_name, String userId) {
+        isSocial = true;
         sUser.setConnection(connection_name, userId);
     }
 

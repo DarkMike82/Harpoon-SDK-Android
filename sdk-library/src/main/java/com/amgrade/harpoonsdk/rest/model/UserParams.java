@@ -92,6 +92,8 @@ class UserParams extends HashMap<String, Object> {
     public void setConnection(String connection_name, String userId) {
         if (mConnection==null) {
             mConnection = new HashMap<>();
+        } else {
+            mConnection.clear();
         }
         HashMap<String, String> user = new HashMap<>();
         user.put("user_id", userId);

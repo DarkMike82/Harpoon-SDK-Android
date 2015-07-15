@@ -2,6 +2,7 @@ package com.amgrade.harpoonsdk.rest;
 
 import com.amgrade.harpoonsdk.rest.model.Checkout;
 import com.amgrade.harpoonsdk.rest.model.Coupon;
+import com.amgrade.harpoonsdk.rest.model.CouponCheckout;
 import com.amgrade.harpoonsdk.rest.model.Venue;
 import com.amgrade.harpoonsdk.rest.model.brand.Brand;
 import com.amgrade.harpoonsdk.rest.model.brand.BrandFeed;
@@ -308,7 +309,7 @@ interface ApiService {
 
     @POST("/{v}/{user.id}/coupon/{coupon.id}/checkout/")
     void couponCheckout(@Path("v") String apiVersion, @Path("user.id") String userId, @Path("coupon.id") String couponId,
-                        @Query("token") String token, @Body Serializable params, RestCallback1<Checkout> callback);
+                        @Query("token") String token, @Body Serializable params, RestCallback1<CouponCheckout> callback);
 
     //-------------------------------------------------------------------
     //Deal api methods

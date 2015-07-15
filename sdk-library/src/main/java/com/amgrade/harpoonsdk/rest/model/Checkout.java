@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 /**
- * Checkout Model (for {@link Event}, {@link Coupon}, {@link SimpleDeal} or {@link GroupDeal})<br/>
+ * Checkout Model (for {@link Event}, {@link SimpleDeal} or {@link GroupDeal})<br/>
  * Created by Michael Dontsov on 24.06.15.
  */
 public class Checkout implements Serializable {

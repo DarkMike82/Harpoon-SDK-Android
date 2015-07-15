@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.amgrade.harpoonsdk.HarpoonSDK;
 import com.amgrade.harpoonsdk.rest.model.Checkout;
 import com.amgrade.harpoonsdk.rest.model.Coupon;
+import com.amgrade.harpoonsdk.rest.model.CouponCheckout;
 import com.amgrade.harpoonsdk.rest.model.ParamsHelper;
 import com.amgrade.harpoonsdk.rest.model.Venue;
 import com.amgrade.harpoonsdk.rest.model.brand.Brand;
@@ -83,6 +84,8 @@ public class RestClient {
         if (sConverter == null) {
             mGson = new GsonBuilder()
                     .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
+                    .registerTypeAdapter(User.class, new InterfaceAdapter<User>(User.class.getName()))
+//                    .registerTypeAdapter(HashMap.class, new InterfaceAdapter<HashMap>(HashMap.class.getName()))
                     .setDateFormat(DATE_FORMAT)
                     .create();
             sConverter = new GsonConverter(mGson);
@@ -822,11 +825,13 @@ public class RestClient {
                 params, new RestCallback1<>(Venue.class, true, listener, "data", "coupon", "venue"));
     }
 
-    public void couponCheckout(String couponId, Integer quantity, ApiListener1<Checkout> listener) {
-        HashMap<String, Integer> params = new HashMap<>();
-        params.put("qty", quantity);
+    public void couponCheckout(String couponId, /*Integer quantity, */ApiListener1<CouponCheckout> listener) {
+        HashMap<String, String> params = new HashMap<>();
+//        params.put("qty", quantity);
+        //TODO only for debug purposes
+        params.put("debug", "B\\”PcVsb,i7D2]L0Y&5>3{,87gPY322");
         getApiService().couponCheckout(sApiVersion, HarpoonSDK.getUserId(), couponId, HarpoonSDK.getUserToken(),
-                params, new RestCallback1<>(Checkout.class, listener, "data", "coupon", "checkout"));
+                params, new RestCallback1<>(CouponCheckout.class, listener, "data", "coupon", "checkout"));
     }
 
     //------Deal api methods--------------------------------------------

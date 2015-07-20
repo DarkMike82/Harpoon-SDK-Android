@@ -1,5 +1,7 @@
 package com.amgrade.harpoonsdk.rest;
 
+import android.util.Log;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,6 +14,7 @@ import java.lang.reflect.Type;
  */
 final class InterfaceAdapter<T> implements /*JsonSerializer<T>,*/ JsonDeserializer<T> {
 
+    private int tmpIndex = 0;
 //    private String mTypeName;
     private Type mType;
     /*private static final HashMap<String, String> sTypeMap;
@@ -42,6 +45,8 @@ final class InterfaceAdapter<T> implements /*JsonSerializer<T>,*/ JsonDeserializ
     @Override
     public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 //        final JsonObject wrapper = (JsonObject) json;
+        Log.d("HARPOON_DEBUG", this.toString()+" deserialization call #"+tmpIndex);
+        tmpIndex++;
         return context.deserialize(json, mType);
     }
 

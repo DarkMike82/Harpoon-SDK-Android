@@ -25,10 +25,18 @@ import com.amgrade.harpoonsdk.rest.model.user.UserFollower;
 import com.amgrade.harpoonsdk.rest.model.user.UserFollowing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import com.google.gson.JsonObject;
+import com.google.gson.TypeAdapter;
+import com.google.gson.internal.ConstructorConstructor;
+import com.google.gson.internal.Excluder;
+import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -84,7 +92,8 @@ public class RestClient {
         if (sConverter == null) {
             mGson = new GsonBuilder()
                     .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
-                    .registerTypeAdapter(User.class, new InterfaceAdapter<User>(User.class.getName()))
+                    .registerTypeAdapter(User.class, createModelAdapter())
+//                    .registerTypeAdapter(User.class, new InterfaceAdapter<User>(User.class.getName()))
 //                    .registerTypeAdapter(HashMap.class, new InterfaceAdapter<HashMap>(HashMap.class.getName()))
                     .setDateFormat(DATE_FORMAT)
                     .create();
@@ -145,6 +154,18 @@ public class RestClient {
                 request.addHeader("Authorization", auth);
             }
         };
+    }
+
+    private TypeAdapter createModelAdapter() {
+        Map<Type, InstanceCreator<?>> typeMap = new HashMap<>();
+        typeMap.put(User.class, new InstanceCreator<User>() {
+            @Override
+            public User createInstance(Type type) {
+                return new User();
+            }
+        });
+        ConstructorConstructor cc = new ConstructorConstructor(typeMap);
+        return new ReflectiveTypeAdapterFactory(cc, null, new Excluder()).create(mGson, TypeToken.get(User.class));
     }
 
     //-----------------------------------------------------------------------------------------------------------------------

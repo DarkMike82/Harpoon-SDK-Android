@@ -14,7 +14,7 @@
     <string name="no_context">SDK context is not initialised!</string>
     <string name="error_net">Unexpected network error occurred. Please try again later or check your internet settings.</string>
     <string name="error_conv">Conversion error (wrong response format).</string>
-    <string name="error_unknown">Unknown error occurred. PLease try again later.</string>
+    <string name="error_unknown">Unknown error occurred. Please try again later.</string>
     <string name="error_server_unknown">Unknown server error. PLease try again later.</string>
 
 

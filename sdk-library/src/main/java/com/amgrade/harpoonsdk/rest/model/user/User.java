@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * User Model<br/>
@@ -41,11 +42,11 @@ public class User implements Serializable {
     @SerializedName("cover")
     private String mCover;
 
-//    @SerializedName("metadata")
-//    private HashMap<String, String> mMetadata;
+    @SerializedName("metadata")
+    private HashMap<String, String> mMetadata;
 
-//    @SerializedName("connection")
-//    private HashMap<String, HashMap<String, String>> mConnections;
+    @SerializedName("connection")
+    private HashMap<String, HashMap<String, String>> mConnections;
 
     @SerializedName("following_count")
     private Integer mFollowingCount;
@@ -123,13 +124,13 @@ public class User implements Serializable {
         return mCover;
     }
 
-//    public HashMap<String, String> getMetadata() {
-//        return mMetadata;
-//    }
+    public HashMap<String, String> getMetadata() {
+        return mMetadata;
+    }
 
-//    public HashMap<String, HashMap<String, String>> getConnections() {
-//        return mConnections;
-//    }
+    public HashMap<String, HashMap<String, String>> getConnections() {
+        return mConnections;
+    }
 
     public Integer getFollowingCount() {
         return mFollowingCount;

@@ -23,11 +23,13 @@ import com.amgrade.harpoonsdk.rest.model.user.UserDealTicket;
 import com.amgrade.harpoonsdk.rest.model.user.UserEventTicket;
 import com.amgrade.harpoonsdk.rest.model.user.UserFollower;
 import com.amgrade.harpoonsdk.rest.model.user.UserFollowing;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.JsonObject;
-import com.google.gson.TypeAdapter;
 import com.google.gson.internal.ConstructorConstructor;
 import com.google.gson.internal.Excluder;
 import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
@@ -65,6 +67,7 @@ public class RestClient {
 
     private static Converter sConverter;
     private static Gson mGson;
+    private static ReflectiveTypeAdapterFactory sTypeAdapterFactory;
 
     private ApiService mApiService;
     private AuthService mAuthService;
@@ -89,12 +92,14 @@ public class RestClient {
     }
 
     private RestClient() {
+        sTypeAdapterFactory = createModelAdapterFactory();
+        Gson auxGson = new Gson();
         if (sConverter == null) {
             mGson = new GsonBuilder()
                     .registerTypeAdapterFactory(new JsonTypeAdapterFactory())
-                    .registerTypeAdapter(User.class, createModelAdapter())
-//                    .registerTypeAdapter(User.class, new InterfaceAdapter<User>(User.class.getName()))
-//                    .registerTypeAdapter(HashMap.class, new InterfaceAdapter<HashMap>(HashMap.class.getName()))
+//                    .registerTypeAdapterFactory(createMapAdapterFactory())
+//                    .registerTypeAdapterFactory(createModelAdapterFactory())
+                    .registerTypeAdapter(User.class, sTypeAdapterFactory.create(auxGson, TypeToken.get(User.class)))
                     .setDateFormat(DATE_FORMAT)
                     .create();
             sConverter = new GsonConverter(mGson);
@@ -156,7 +161,7 @@ public class RestClient {
         };
     }
 
-    private TypeAdapter createModelAdapter() {
+    private ReflectiveTypeAdapterFactory createModelAdapterFactory() {
         Map<Type, InstanceCreator<?>> typeMap = new HashMap<>();
         typeMap.put(User.class, new InstanceCreator<User>() {
             @Override
@@ -165,8 +170,58 @@ public class RestClient {
             }
         });
         ConstructorConstructor cc = new ConstructorConstructor(typeMap);
-        return new ReflectiveTypeAdapterFactory(cc, null, new Excluder()).create(mGson, TypeToken.get(User.class));
+        Excluder exc = new Excluder().withExclusionStrategy(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return false;
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+        }, false, true);
+        return new ReflectiveTypeAdapterFactory(cc, FieldNamingPolicy.IDENTITY, exc);
     }
+
+    /*private MapTypeAdapterFactory createMapAdapterFactory() {
+        Map<Type, InstanceCreator<?>> typeMap = new HashMap<>();
+        typeMap.put(HashMap.class, new InstanceCreator<HashMap>() {
+            @Override
+            public HashMap createInstance(Type type) {
+                return new HashMap();
+            }
+        });
+        ConstructorConstructor cc = new ConstructorConstructor(typeMap);
+        return new MapTypeAdapterFactory(cc, true);
+    }*/
+
+    /*private TypeAdapter createModelAdapter() {
+        //prepare tools for typeAdapter factory
+        Map<Type, InstanceCreator<?>> typeMap = new HashMap<>();
+        typeMap.put(User.class, new InstanceCreator<User>() {
+            @Override
+            public User createInstance(Type type) {
+                return new User();
+            }
+        });
+        ConstructorConstructor cc = new ConstructorConstructor(typeMap);
+        Excluder exc = new Excluder().withExclusionStrategy(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return false;
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+        }, false, true);
+        //create factory
+        ReflectiveTypeAdapterFactory factory = new ReflectiveTypeAdapterFactory(cc, FieldNamingPolicy.IDENTITY, exc);
+        //return adapter
+        return factory.create(new Gson(), TypeToken.get(User.class));
+    }*/
 
     //-----------------------------------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------------------------------------------
@@ -264,8 +319,9 @@ public class RestClient {
      * @param listener listener for result.
      */
     public void createUser(ApiListener1<User> listener) {
-        getApiService().createUser(sApiVersion, HarpoonSDK.getAppToken(), ParamsHelper.getUser(),
-                new RestCallback1<>(User.class, listener, "data", "user"));
+        RestCallback1<User> callback = new RestCallback1<>(User.class, listener, "data", "user");
+        callback.setOnSuccessAction(RestCallback1.SET_USER_ID);
+        getApiService().createUser(sApiVersion, HarpoonSDK.getAppToken(), ParamsHelper.getUser(), callback);
     }
 
     public void getUser(ApiListener1<User> listener) {

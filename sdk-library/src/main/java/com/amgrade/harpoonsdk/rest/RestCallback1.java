@@ -27,13 +27,14 @@ import retrofit.converter.ConversionException;
 class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
     private static final String OK = "success";
 
+    public static final int NO_ACTION = -1;
     public static final int SET_USER_ID = 1;
 
     protected ApiListener1<T> mListener;
     protected String[] mKeys;
     private Class mDataClass;
     private String mBaseTypeName;
-    private int mSuccessAction = -1;
+    private int mSuccessAction = NO_ACTION;
     private boolean isArrayResponse = false;
 
     public RestCallback1(Class c, ApiListener1<T> listener, String... keys) {
@@ -55,7 +56,9 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
     public void success(JsonObject jsonObject, Response response) {
         //since 09.06.2015 API settings changed, so only "success" responses will be processed here
         JsonElement responseData = extractData(mKeys, jsonObject);
-        performAction(mSuccessAction, responseData.getAsJsonObject());
+        if (mSuccessAction!=NO_ACTION) {
+            performAction(mSuccessAction, responseData);
+        }
 //        if (responseData==null) {
 //            mListener.onSuccess();
 //        } else {
@@ -178,7 +181,14 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
         return errorInfo;
     }
 
-    private void performAction(int action, JsonObject data) {
+    private void performAction(int action, JsonElement responseData) {
+        JsonObject data = null;
+        JsonArray dataArray = null;
+        if (isArrayResponse) {
+            dataArray = responseData.getAsJsonArray();
+        } else {
+            data = responseData.getAsJsonObject();
+        }
         switch (action) {
             case SET_USER_ID:
                 HarpoonSDK.setUser(data.get("id").getAsString(),

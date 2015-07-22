@@ -1,5 +1,6 @@
 package com.amgrade.harpoonsdk.rest.model.event;
 
+import com.amgrade.harpoonsdk.Constants;
 import com.amgrade.harpoonsdk.rest.model.Venue;
 import com.amgrade.harpoonsdk.rest.model.brand.Brand;
 import com.google.gson.annotations.SerializedName;
@@ -14,7 +15,7 @@ import java.util.Date;
  * Event Model<br/>
  * Created by Michael Dontsov on 24.06.15.
  */
-public class Event implements Serializable {
+public class Event implements Serializable, Constants {
     @SerializedName("id")
     private String mId;
 
@@ -70,7 +71,7 @@ public class Event implements Serializable {
     private Brand mOrganiserBrand;
 
 
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat();
 
 
     public Event() {
@@ -104,31 +105,39 @@ public class Event implements Serializable {
         return mAlias;
     }
 
-    public Date getFromDate() {
+    public String getFromDate() {
         if (mFromDate==null) {
             return null;
         } else {
             Date d = null;
+            String res = null;
             try {
+                mDateFormat.applyPattern(IN_PATTERN);
                 d = mDateFormat.parse(mFromDate);
+                mDateFormat.applyPattern(OUT_PATTERN);
+                res = mDateFormat.format(d);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            return d;
+            return res;
         }
     }
 
-    public Date getToDate() {
+    public String getToDate() {
         if (mToDate==null) {
             return null;
         } else {
             Date d = null;
+            String res = null;
             try {
+                mDateFormat.applyPattern(IN_PATTERN);
                 d = mDateFormat.parse(mToDate);
+                mDateFormat.applyPattern(OUT_PATTERN);
+                res = mDateFormat.format(d);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            return d;
+            return res;
         }
     }
 

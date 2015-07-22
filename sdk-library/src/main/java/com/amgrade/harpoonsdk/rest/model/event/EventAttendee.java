@@ -1,5 +1,6 @@
 package com.amgrade.harpoonsdk.rest.model.event;
 
+import com.amgrade.harpoonsdk.Constants;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Date;
  * Event Attendee Model<br/>
  * Created by Michael Dontsov on 23.06.15.
  */
-public class EventAttendee implements Serializable {
+public class EventAttendee implements Serializable, Constants {
     @SerializedName("id")
     private String mId;
 
@@ -33,7 +34,7 @@ public class EventAttendee implements Serializable {
     @SerializedName("joined_at")
     private String mJoinedAt;
 
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat();
 
 
     public EventAttendee() {
@@ -63,17 +64,21 @@ public class EventAttendee implements Serializable {
         return mProfilePicture;
     }
 
-    public Date getJoinedAt() {
+    public String getJoinedAt() {
         if (mJoinedAt==null) {
             return null;
         } else {
             Date d = null;
+            String res = null;
             try {
+                mDateFormat.applyPattern(IN_PATTERN);
                 d = mDateFormat.parse(mJoinedAt);
+                mDateFormat.applyPattern(OUT_PATTERN);
+                res = mDateFormat.format(d);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            return d;
+            return res;
         }
     }
 

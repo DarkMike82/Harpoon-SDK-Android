@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.amgrade.harpoonsdk.rest.RestClient;
+import com.amgrade.harpoonsdk.rest.model.user.User;
 
 /**
  * Created by Michael Dontsov on 27.05.15.
@@ -88,9 +90,10 @@ public class HarpoonSDK {
      * @param id user ID
      * @param auth_code authentication code (to exchange for token)
      */
-    public static void setUser(String id, String auth_code) {
+    public static void setUser(String userData, String id, String auth_code) {
         sUserId = id;
         sUserAuthCode = auth_code;
+        saveToPrefs("user", userData);
         saveToPrefs("user.id", sUserId);
         saveToPrefs("user.code", sUserAuthCode);
     }
@@ -152,6 +155,12 @@ public class HarpoonSDK {
             return true;
         }
         return false;
+    }
+
+    public static User getCurrentUser() {
+        String userData = loadStringPref("user");
+        User currentUser = RestClient.getGson().fromJson(userData, User.class);
+        return currentUser;
     }
 
     public static String getUserId() {

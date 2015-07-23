@@ -1,5 +1,6 @@
 package com.amgrade.harpoonsdk.rest.model.user;
 
+import com.amgrade.harpoonsdk.Constants;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Date;
  * User Follower Model<br/>
  * Created by Michael Dontsov on 23.06.15.
  */
-public class UserFollower implements Serializable {
+public class UserFollower implements Serializable, Constants {
     @SerializedName("id")
     private String mId;
 
@@ -33,7 +34,7 @@ public class UserFollower implements Serializable {
     @SerializedName("started_follow_at")
     private String mStartedFollowAt;
 
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat();
 
 
     public UserFollower() {
@@ -63,8 +64,23 @@ public class UserFollower implements Serializable {
         return mProfilePicture;
     }
 
-    public Date getStartedFollowAt() {
+    public String getStartedFollowAt() {
         if (mStartedFollowAt==null) {
+            return null;
+        } else {
+            Date d = null;
+            String res = null;
+            try {
+                mDateFormat.applyPattern(IN_PATTERN);
+                d = mDateFormat.parse(mStartedFollowAt);
+                mDateFormat.applyPattern(OUT_PATTERN);
+                res = mDateFormat.format(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return res;
+        }
+        /*if (mStartedFollowAt==null) {
             return null;
         } else {
             Date d = null;
@@ -74,7 +90,7 @@ public class UserFollower implements Serializable {
                 e.printStackTrace();
             }
             return d;
-        }
+        }*/
     }
 
 }

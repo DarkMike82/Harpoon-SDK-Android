@@ -173,6 +173,7 @@ public class RestClient {
         addTypeToMap(typeMap, Event.class);
         addTypeToMap(typeMap, EventAttendee.class);
         addTypeToMap(typeMap, EventTicket.class);
+//        addTypeToMap(typeMap, Ticket.class);
         addTypeToMap(typeMap, Brand.class);
         addTypeToMap(typeMap, Venue.class);
         addTypeToMap(typeMap, Coords.class);

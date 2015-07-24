@@ -67,10 +67,16 @@ public class ParamsHelper {
 
     public static HashMap<String, Object> checkoutList(String[] ids, Integer[] quantities) {
         HashMap<String, Object> res = new HashMap<>();
-        ArrayList<Ticket> list = new ArrayList<>();
+        HashMap<String, Object> ticket;
+        ArrayList<HashMap> list = new ArrayList<>();
         for (int i=0;i<ids.length;i++) {
-            Ticket item = new Ticket(ids[i], quantities[i]);
-            list.add(item);
+            if (quantities[i] <= 0) {
+                continue;
+            }
+            ticket = new HashMap<>();
+            ticket.put("id", ids[i]);
+            ticket.put("qty", quantities[i]);
+            list.add(ticket);
         }
         res.put("ticket", list);
         return res;

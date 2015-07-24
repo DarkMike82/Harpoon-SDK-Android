@@ -86,16 +86,23 @@ public class HarpoonSDK {
     }*/
 
     /**
-     * Save data of validated user (after creation or login)
+     * Save id and auth_code of validated user (after creation or login)
      * @param id user ID
      * @param auth_code authentication code (to exchange for token)
      */
-    public static void setUser(String userData, String id, String auth_code) {
+    public static void setUserId(String id, String auth_code) {
         sUserId = id;
         sUserAuthCode = auth_code;
-        saveToPrefs("user", userData);
         saveToPrefs("user.id", sUserId);
         saveToPrefs("user.code", sUserAuthCode);
+    }
+
+    /**
+     * Save full data of current user (after creation, login or update)
+     * @param userData String representation of Json containing full user data
+     */
+    public static void setUser(String userData) {
+        saveToPrefs("user", userData);
     }
 
     /**

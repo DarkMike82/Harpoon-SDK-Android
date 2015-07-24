@@ -245,11 +245,11 @@ interface ApiService {
                            @Query("token") String token, @Query("data") String paramString,
                            RestCallback1<EventAttendee> callback);
 
-    @GET("/{v}/{userId}/event/{eventId}/venue")
+    @GET("/{v}/{userId}/event/{eventId}/venue/")
     void getEventVenues(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
                         @Query("token") String token, @Query("data") String paramString, RestCallback1<Venue> callback);
 
-    @POST("/{v}/{userId}/event/{eventId}/checkout")
+    @POST("/{v}/{userId}/event/{eventId}/checkout/")
     void eventCheckout(@Path("v") String apiVersion, @Path("userId") String user_id, @Path("eventId") String event_id,
                        @Query("token") String token, @Body Serializable params, RestCallback1<Checkout> callback);
 

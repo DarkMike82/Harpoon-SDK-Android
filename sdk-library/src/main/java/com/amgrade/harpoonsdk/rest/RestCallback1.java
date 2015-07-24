@@ -191,8 +191,8 @@ class RestCallback1<T extends Serializable> implements Callback<JsonObject> {
         }
         switch (action) {
             case SET_USER_ID:
-                HarpoonSDK.setUser(data.toString(), data.get("id").getAsString(),
-                        data.get("authorization_code").getAsString());
+                HarpoonSDK.setUser(data.toString());
+                HarpoonSDK.setUserId(data.get("id").getAsString(), data.get("authorization_code").getAsString());
                 break;
             default:
                 break;
